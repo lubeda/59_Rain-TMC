@@ -177,7 +177,6 @@ sub RainTMC_ParseHttpResponse($) {
         my $rainDataStart = "unknown";
         my $rainData      = "";
         my $rainMax       = 0;
-        my $as_svg        = "";
         my $rain          = 0;
         my $rainNow       = 0;
         my $line          = 0;
@@ -185,7 +184,6 @@ sub RainTMC_ParseHttpResponse($) {
         my $endchanged    = 0;
         my $endline       = 0;
         my $parse         = 1;
-
         
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
 
