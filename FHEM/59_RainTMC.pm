@@ -167,9 +167,9 @@ sub RainTMC_ParseHttpResponse($) {
     elsif ( $data ne "" ) {
         Log3( $name, 3, "$name: returned: $data" );
         my $decoded_json = decode_json($data);
-        
+        my $entry ;
         Log3 ($name,3,$decoded_json->{ForecastResult});
-        foreach my $entry ($decoded_json->{ForecastResult})) 
+        foreach $entry ($decoded_json->{ForecastResult}) 
         {
             Log3 ($name,3, $entry->{value}. " " . $entry->{TimeStamp};
         }
