@@ -166,7 +166,7 @@ sub RainTMC_ParseHttpResponse($) {
         Log3( $name, 3, "$name: returned: $data" );
         my @decoded_json = @{decode_json($data)};
 
-        foreach my $data in  (@decoded_json->ForecastResult) {
+        foreach my $data (@decoded_json->ForecastResult) {
             Log3( $name, 3,$data->value;);
         }
 
@@ -226,7 +226,7 @@ sub RainTMC_ParseHttpResponse($) {
             
             $rainData .= ":" . sprintf( "%.3f", $rain );
             
-            $rainDataRaw .= ":" . $amount;
+            
             
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
@@ -244,7 +244,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         readingsBulkUpdateIfChanged( $hash, "rainData", $rainData );
-        readingsBulkUpdateIfChanged( $hash, "rainDataRaw", $rainDataRaw );
+        
         readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
         readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
         readingsBulkUpdateIfChanged( $hash, "rainEnd", $rainend, $endchanged );
