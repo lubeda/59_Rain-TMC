@@ -30,6 +30,7 @@
 
 package main;
 
+use Data::Dumper;
 use JSON;
 use strict;
 use warnings;
@@ -169,9 +170,11 @@ sub RainTMC_ParseHttpResponse($) {
         
         Log3 ($name,3,$decoded_json->{ForecastResult});
         
-        foreach my $entry ($decoded_json->{ForecastResult}) {
-            Log3 ($name,3,$entry);
-        }
+
+
+        Log3 ($name,3,Dumper($decoded_json->{ForecastResult}));
+            Log3 ($name,3,Dumper($entry));
+        
 
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
