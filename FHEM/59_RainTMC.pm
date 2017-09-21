@@ -166,11 +166,8 @@ sub RainTMC_ParseHttpResponse($) {
     elsif ( $data ne "" ) {
         Log3( $name, 3, "$name: returned: $data" );
         my $decoded_json = decode_json($data);
-
-        foreach my $data ($decoded_json->ForecastResult) {
-            Log3( $name, 3,$data->value);
-        }
-
+        print_r($decoded_json);
+        
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
