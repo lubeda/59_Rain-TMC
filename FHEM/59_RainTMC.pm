@@ -88,23 +88,24 @@ sub RainTMC_Define($$) {
     $hash->{INTERVAL}  = $interval;
     $hash->{LATITUDE}  = $latitude;
     $hash->{LONGITUDE} = $longitude;
-    $hash->{URL} =
-        "http://gps.RainTMC.nl/getrr.php?lat="
+    $hash->{URL} ="https://api.themeteocompany.com/precipitation/getforecastbylatlon/?&radius=0&lat="
       . $hash->{LATITUDE} . "&lon="
       . $hash->{LONGITUDE};
-    $hash->{".HTML"}                   = "<DIV>";
+    
     $hash->{READINGS}{rainBegin}{TIME} = TimeNow();
     $hash->{READINGS}{rainBegin}{VAL}  = "unknown";
     
-    $hash->{.rainData}  = "unknown";
+    $hash->{RAINDATA}  = "unknown";
 
     $hash->{READINGS}{rainDataStart}{TIME} = TimeNow();
     $hash->{READINGS}{rainDataStart}{VAL}  = "unknown";
 
     $hash->{READINGS}{rainNow}{TIME}    = TimeNow();
     $hash->{READINGS}{rainNow}{VAL}     = "unknown";
+    
     $hash->{READINGS}{rainEnd}{TIME}    = TimeNow();
     $hash->{READINGS}{rainEnd}{VAL}     = "unknown";
+    
     $hash->{READINGS}{rainAmount}{TIME} = TimeNow();
     $hash->{READINGS}{rainAmount}{VAL}  = "init";
 
