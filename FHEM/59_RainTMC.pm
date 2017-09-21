@@ -23,48 +23,29 @@
 
 #  For more information, please refer to <http://unlicense.org/>
 
-# See also https://www.buienradar.nl/overbuienradar/gratis-weerdata
+# See also https://www.RainTMC.nl/overRainTMC/gratis-weerdata
 
 # V 1.0 release über Github
 
 
 package main;
 
-use DateTime;
-use DateTime::Duration;
-
 use strict;
 use warnings;
 use HttpUtils;
 
 #####################################
-sub Buienradar_Initialize($) {
+sub RainTMC_Initialize($) {
 
     my ($hash) = @_;
 
-    $hash->{DefFn}       = "Buienradar_Define";
-    $hash->{UndefFn}     = "Buienradar_Undef";
-    $hash->{GetFn}       = "Buienradar_Get";
-    $hash->{FW_detailFn} = "Buienradar_detailFn";
+    $hash->{DefFn}       = "RainTMC_Define";
+    $hash->{UndefFn}     = "RainTMC_Undef";
     $hash->{AttrList}    = $readingFnAttributes;
 }
 
-sub Buienradar_detailFn($$$$) {
-    my ( $FW_wname, $d, $room, $pageHash ) =
-      @_;    # pageHash is set for summaryFn.
-    my $hash = $defs{$d};
-
-    return if ( !defined( $hash->{URL} ) );
-
-    return
-        Buienradar_HTML( $hash->{NAME} )
-      . "<br><a href="
-      . $hash->{URL}
-      . " target=_blank>open data in new window</a><br>";
-}
-
 #####################################
-sub Buienradar_Undef($$) {
+sub RainTMC_Undef($$) {
 
     my ( $hash, $arg ) = @_;
 
@@ -72,79 +53,9 @@ sub Buienradar_Undef($$) {
     return undef;
 }
 
-sub Buienradar_TimeCalc($$) {
-
-    # TimeA - TimeB
-    my ( $timeA, $timeB ) = @_;
-
-    my @AtimeA = split /:/, $timeA;
-    my @AtimeB = split /:/, $timeB;
-
-    if ( $AtimeA[0] < $AtimeB[0] ) {
-        $AtimeA[0] += 24;
-    }
-
-    if ( ( $AtimeA[1] < $AtimeB[1] ) && ( $AtimeA[0] != $AtimeB[0] ) ) {
-        $AtimeA[1] += 60;
-    }
-
-    my $result = ( $AtimeA[0] - $AtimeB[0] ) * 60 + $AtimeA[1] - $AtimeB[1];
-
-    return $result;
-}
-
-###################################
-sub Buienradar_Get($$@) {
-
-    my ( $hash, $name, $opt, @args ) = @_;
-
-    return "\"get $name\" needs at least one argument" unless ( defined($opt) );
-
-    if ( $opt eq "testVal" ) {
-
-        #return  @args;
-        return 10**( ( $args[0] - 109 ) / 32 );
-    }
-    elsif ( $opt eq "rainDuration" ) {
-        my $begin = ReadingsVal( $name, "rainBegin", "00:00" );
-        my $end   = ReadingsVal( $name, "rainEnd",   "00:00" );
-        if ( $begin ne $end ) {
-            return Buienradar_TimeCalc( $end, $begin );
-        }
-        else {
-            return "unknown";
-        }
-    }
-
-    elsif ( $opt eq "refresh" ) {
-        Buienradar_RequestUpdate($hash);
-        return "";
-    }
-    elsif ( $opt eq "startsIn" ) {
-        my $begin = ReadingsVal( $name, "rainBegin", "unknown" );
-        my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
-          localtime(time);
-        my $result = "";
-
-        if ( $begin ne "unknown" ) {
-
-            $result = Buienradar_TimeCalc( $begin, "$hour:$min" );
-
-            if ( $result < 0 ) {
-                $result = "raining";
-            }
-            return $result;
-        }
-        return "no rain";
-    }
-    else {
-        return
-"Unknown argument $opt, choose one of testVal refresh startsIn rainDuration";
-    }
-}
 
 #####################################
-sub Buienradar_Define($$) {
+sub RainTMC_Define($$) {
 
     my ( $hash, $def ) = @_;
 
@@ -164,7 +75,7 @@ sub Buienradar_Define($$) {
     else {
         return
           int(@a)
-          . " <=syntax: define <name> Buienradar [<latitude> <longitude>]";
+          . " <=syntax: define <name> RainTMC [<latitude> <longitude>]";
     }
 
     $hash->{STATE} = "Initialized";
@@ -178,15 +89,14 @@ sub Buienradar_Define($$) {
     $hash->{LATITUDE}  = $latitude;
     $hash->{LONGITUDE} = $longitude;
     $hash->{URL} =
-        "http://gps.buienradar.nl/getrr.php?lat="
+        "http://gps.RainTMC.nl/getrr.php?lat="
       . $hash->{LATITUDE} . "&lon="
       . $hash->{LONGITUDE};
     $hash->{".HTML"}                   = "<DIV>";
     $hash->{READINGS}{rainBegin}{TIME} = TimeNow();
     $hash->{READINGS}{rainBegin}{VAL}  = "unknown";
-
-    $hash->{READINGS}{rainData}{TIME} = TimeNow();
-    $hash->{READINGS}{rainData}{VAL}  = "unknown";
+    
+    $hash->{.rainData}  = "unknown";
 
     $hash->{READINGS}{rainDataStart}{TIME} = TimeNow();
     $hash->{READINGS}{rainDataStart}{VAL}  = "unknown";
@@ -198,17 +108,17 @@ sub Buienradar_Define($$) {
     $hash->{READINGS}{rainAmount}{TIME} = TimeNow();
     $hash->{READINGS}{rainAmount}{VAL}  = "init";
 
-    Buienradar_RequestUpdate($hash);
-    Buienradar_ScheduleUpdate($hash);
-    # InternalTimer( gettimeofday() + $hash->{INTERVAL},  "Buienradar_ScheduleUpdate", $hash, 0 );
+    RainTMC_RequestUpdate($hash);
+    RainTMC_ScheduleUpdate($hash);
+    # InternalTimer( gettimeofday() + $hash->{INTERVAL},  "RainTMC_ScheduleUpdate", $hash, 0 );
 
     return undef;
 }
 
-sub Buienradar_ScheduleUpdate($) {
+sub RainTMC_ScheduleUpdate($) {
     my ($hash) = @_;
     my $nextupdate = 0;
-    RemoveInternalTimer( $hash, "Buienradar_ScheduleUpdate" );
+    RemoveInternalTimer( $hash, "RainTMC_ScheduleUpdate" );
 
     if ( !$hash->{SHORTRELOAD} ) {
         $nextupdate = gettimeofday() + $hash->{INTERVAL};
@@ -217,14 +127,14 @@ sub Buienradar_ScheduleUpdate($) {
         $nextupdate = gettimeofday() + 90;
         delete $hash->{SHORTRELOAD};
     }
-    InternalTimer( $nextupdate, "Buienradar_ScheduleUpdate", $hash );
+    InternalTimer( $nextupdate, "RainTMC_ScheduleUpdate", $hash );
     $hash->{NEXTUPDATE} = FmtDateTime($nextupdate);
-    Buienradar_RequestUpdate($hash);
+    RainTMC_RequestUpdate($hash);
 
     return 1;
 }
 
-sub Buienradar_RequestUpdate($) {
+sub RainTMC_RequestUpdate($) {
     my ($hash) = @_;
 
     my $param = {
@@ -232,90 +142,14 @@ sub Buienradar_RequestUpdate($) {
         timeout  => 10,
         hash     => $hash,
         method   => "GET",
-        callback => \&Buienradar_ParseHttpResponse
+        callback => \&RainTMC_ParseHttpResponse
     };
 
     HttpUtils_NonblockingGet($param);
     Log3( $hash->{NAME}, 4, $hash->{NAME} . ": Update requested" );
 }
 
-sub Buienradar_HTML($;$) {
-    my ( $name, $width ) = @_;
-    my @values = split /:/, ReadingsVal( $name, "rainData", "" );
-    my $hash = $defs{$name};
-
-    my $as_html = <<'END_MESSAGE';
-<style>
-
-.BRchart div {
-  font: 10px sans-serif;
-  background-color: steelblue;
-  text-align: right;
-  padding: 3px;
-  margin: 1px;
-  color: white;
-}
-
-</style>
-<div class="BRchart">
-END_MESSAGE
-
-    $as_html .= "<BR>Niederschlag (<a href=./fhem?detail=$name>$name</a>)<BR>";
-
-    $as_html .= ReadingsVal( $name, "rainDataStart", "unknown" ) . "<BR>";
-    my $factor =
-      ( $width ? $width : 700 ) / ( 1 + ReadingsVal( $name, "rainMax", "0" ) );
-    foreach my $val (@values) {
-        $as_html .=
-            '<div style="width: '
-          . ( int( $val * $factor ) + 30 ) . 'px;">'
-          . sprintf( "%.3f", $val )
-          . '</div>';
-    }
-
-    $as_html .= "</DIV><BR>";
-    return ($as_html);
-}
-
-sub Buienradar_HTMLRaw($;$) {
-    my ( $name, $width ) = @_;
-    my @values = split /:/, ReadingsVal( $name, "rainDataRaw", "" );
-    my $hash = $defs{$name};
-
-    my $as_html = <<'END_MESSAGE';
-<style>
-
-.BRchart div {
-  font: 10px sans-serif;
-  background-color: steelblue;
-  text-align: right;
-  padding: 3px;
-  margin: 1px;
-  color: white;
-}
-
-</style>
-<div class="BRchart">
-END_MESSAGE
-
-    $as_html .= "<BR>Niederschlag (<a href=./fhem?detail=$name>$name</a>)<BR>";
-
-    $as_html .= ReadingsVal( $name, "rainDataStart", "unknown" ) . "<BR>";
-    my $factor =
-      ( $width ? $width : 700 ) / ( 1 + ReadingsVal( $name, "rainMax", "0" ) );
-    foreach my $val (@values) {
-        $as_html .=
-            '<div style="width: '
-          . ( int( $val * $factor ) + 30 ) . 'px;">'
-          . sprintf( "%.3f", $val )
-          . '</div>';
-    }
-
-    $as_html .= "</DIV><BR>";
-    return ($as_html);
-}
-
-sub Buienradar_ParseHttpResponse($) {
+sub RainTMC_ParseHttpResponse($) {
     my ( $param, $err, $data ) = @_;
     my $hash = $param->{hash};
     my $name = $hash->{NAME};
@@ -325,17 +159,16 @@ sub Buienradar_ParseHttpResponse($) {
             "$name: error while requesting " . $param->{url} . " - $err" );
         $hash->{STATE}       = "Error: " . $err . " => " . $data;
         $hash->{SHORTRELOAD} = 1;
-        Buienradar_ScheduleUpdate($hash);
+        RainTMC_ScheduleUpdate($hash);
     }
     elsif ( $data ne "" ) {
-        Log3( $name, 5, "$name: returned: $data" );
+        Log3( $name, 3, "$name: returned: $data" );
 
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
         my $rainDataStart = "unknown";
         my $rainData      = "";
-        my $rainDataRaw   = "";
         my $rainMax       = 0;
         my $as_svg        = "";
         my $rain          = 0;
@@ -363,7 +196,6 @@ sub Buienradar_ParseHttpResponse($) {
                 $rainNow = sprintf( "%.3f", $rainamount ) * 12;
                 $rainDataStart = substr( $rtime, 0, -1 );
                 $rainData = sprintf( "%.3f", $rainamount );
-                $rainDataRaw = $rainamount;
             }
 
             if ($parse) {
@@ -414,7 +246,7 @@ sub Buienradar_ParseHttpResponse($) {
     }
 }
 
-sub Buienradar_logProxy($) {
+sub RainTMC_logProxy($) {
     my ($name) = @_;
     my @values = split /:/, ReadingsVal( $name, "rainData", "" );
     my $hash   = $defs{$name};
@@ -439,7 +271,7 @@ sub Buienradar_logProxy($) {
     return ( $ret, 0, $max );
 }
 
-sub Buienradar_logProxyRaw($) {
+sub RainTMC_logProxyRaw($) {
     my ($name) = @_;
     my @values = split /:/, ReadingsVal( $name, "rainDataRaw", "" );
     my $hash   = $defs{$name};
@@ -464,7 +296,7 @@ sub Buienradar_logProxyRaw($) {
     return ( $ret, 0, $max );
 }
 
-sub Buienradar_SVG($) {
+sub RainTMC_SVG($) {
     my ($name) = @_;
     my $retval;
     $retval = <<'END_MESSAGE';
@@ -516,17 +348,17 @@ END_MESSAGE
 =pod
 =begin html_DE
 
-<a name="Buienradar"></a>
-<h3>Buienradar</h3>
+<a name="RainTMC"></a>
+<h3>RainTMC</h3>
 <ul>
-    <p>Niederschlagsvorhersage auf Basis von freien Wetterdaten <a href="">https://www.buienradar.nl/overbuienradar/gratis-weerdata</a></p>
+    <p>Niederschlagsvorhersage auf Basis von freien Wetterdaten <a href="">https://www.RainTMC.nl/overRainTMC/gratis-weerdata</a></p>
     <BR>
-    <a name="Buienradardefine"></a>
+    <a name="RainTMCdefine"></a>
     <p><b>Define</b></p>
     <ul>
-        <p><code>define &lt;name&gt; Buienradar &lt;Logitudename&gt; &lt;Latitude&gt;</code></p>
+        <p><code>define &lt;name&gt; RainTMC &lt;Logitudename&gt; &lt;Latitude&gt;</code></p>
     </ul>
-    <a name="Buienradarget"></a>
+    <a name="RainTMCget"></a>
     <p><b>Get</b></p>
     <ul>
         <p>Folgende Werte kann man mit get abfragen:</p>
@@ -541,10 +373,10 @@ END_MESSAGE
             <p><code>refresh</code> Neue Daten werde nonblocking abgefragt/</p>
         </li>
         <li>
-            <p><code>testVal</code> Rechnet einen Buienradar Wert in mm/m² um ( zu Testzwecken)</p>
+            <p><code>testVal</code> Rechnet einen RainTMC Wert in mm/m² um ( zu Testzwecken)</p>
         </li>
     </ul>
-    <a name="Buienradarreadings"></a>
+    <a name="RainTMCreadings"></a>
     <p><b>Readings</b></p>
     <p>Folgende Readings bietet das Modul:</p><br>
     <ul><li>
@@ -555,16 +387,16 @@ END_MESSAGE
     Regenbegins oder "unknown"</li>    
     <li><code>rainEnd</code>Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
 </ul>
-<a name="Buienradarfunctions"></a>
+<a name="RainTMCfunctions"></a>
 <p><b>Funktionen</b></p>
 
     <p>Zur Visualisierung gibt es drei Funktionen:</p> 
     <ul>
-        <li><code>{Buienradar_HTML(<DEVICE>,<Pixel>)}</code> also z.B. {Buienradar_HTML("BR",500)} gibt eine reine HTML Liste zur&uuml;ck, der l&auml;ngste Balken hat dann 500 Pixel
+        <li><code>{RainTMC_HTML(<DEVICE>,<Pixel>)}</code> also z.B. {RainTMC_HTML("BR",500)} gibt eine reine HTML Liste zur&uuml;ck, der l&auml;ngste Balken hat dann 500 Pixel
             (nicht so schön ;-)) </li>
-        <li><code>{Buienradar_SVG(<DEVICE>)}</code>also z.B. {Buienradar_SVG("BR")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
-<li><code> {Buienradar_logProxy(
-        <DEVICE>)}</code>also z.B. {Buienradar_logProxy("BR")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
+        <li><code>{RainTMC_SVG(<DEVICE>)}</code>also z.B. {RainTMC_SVG("BR")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
+<li><code> {RainTMC_logProxy(
+        <DEVICE>)}</code>also z.B. {RainTMC_logProxy("BR")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
             und FTUI Charts erstellen.</li>        
         </ul> 
 </ul>
