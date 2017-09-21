@@ -186,55 +186,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $endline       = 0;
         my $parse         = 1;
 
-        foreach ( split( /\n/, $data ) ) {
-            my ( $amount, $rtime ) = ( split( /\|/, $_ ) )[ 0, 1 ];
-
-            if ( $amount > 0 ) {
-                $rain = 10**( ( $amount - 109 ) / 32 );
-                $rainamount += $rain / 12;
-            }
-            else {
-                $rain = 0;
-            }
-
-            $line += 1;
-
-            if ( $line == 1 ) {
-                $rainNow = sprintf( "%.3f", $rainamount ) * 12;
-                $rainDataStart = substr( $rtime, 0, -1 );
-                $rainData = sprintf( "%.3f", $rainamount );
-            }
-
-            if ($parse) {
-                if ($beginchanged) {
-                    if ( $amount > 0 ) {
-                        $rainend = $rtime;
-                    }
-                    else {
-                        $rainend    = $rtime;
-                        $endchanged = 1;
-                        $parse      = 0;      # Nur den ersten Schauer auswerten
-                    }
-                }
-                else {
-                    if ( $amount > 0 ) {
-                        $rainbegin    = $rtime;
-                        $beginchanged = 1;
-                        $rainend      = $rtime;
-                    }
-                }
-            }
-            
-            $rainData .= ":" . sprintf( "%.3f", $rain );
-            
-            
-            
-            $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
-            
-         
-        }
         
-
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
 
         readingsBeginUpdate($hash);
