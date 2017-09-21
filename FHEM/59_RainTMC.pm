@@ -170,7 +170,7 @@ sub RainTMC_ParseHttpResponse($) {
         Log3 ($name,3,$decoded_json->{ForecastResult});
         
         foreach my $entry ($decoded_json->{ForecastResult}) {
-            Log3 ($name,3,$entry->{value});
+            Log3 ($name,3,$entry);
         }
 
         my $rainamount    = 0.0;
