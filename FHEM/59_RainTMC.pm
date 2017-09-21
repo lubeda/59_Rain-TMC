@@ -167,7 +167,7 @@ sub RainTMC_ParseHttpResponse($) {
         Log3( $name, 3, "$name: returned: $data" );
         my @decoded_json = @{decode_json($data)};
 
-        foreach my @data (@decoded_json->ForecastResult) {
+        foreach my $data (@decoded_json->ForecastResult) {
             Log3( $name, 3,$data->value);
         }
 
@@ -231,13 +231,10 @@ sub RainTMC_ParseHttpResponse($) {
             
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
-            $as_svg .= "['"
-              . ( ( $line % 2 ) ? substr( $rtime, 0, -1 ) : "" ) . "',"
-              . sprintf( "%.3f", $rain ) . "],";
+         
         }
-        $as_svg = substr( $as_svg, 0, -1 );
+        
 
-        $hash->{".SVG"} = $as_svg;
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
 
         readingsBeginUpdate($hash);
@@ -303,52 +300,6 @@ sub RainTMC_logProxyRaw($) {
     return ( $ret, 0, $max );
 }
 
-sub RainTMC_SVG($) {
-    my ($name) = @_;
-    my $retval;
-    $retval = <<'END_MESSAGE';
-<style>
-.chart_div {width:400px; height:310px;}
-</style>
-<div id="chart_div" style="width:100%; height:100%"></div>
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
- <script type="text/javascript">
-
-     google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable([
-          ['string', 'mm/m² per h'],
-END_MESSAGE
-
-    $retval .= $defs{$name}->{".SVG"};
-    $retval .= <<'END_MESSAGE';
-]);
-
- var options = {
-          title: 'Niederschlag',
-END_MESSAGE
-    $retval .= "subtitle: 'Vorhersage (" . $name . ")',";
-
-    $retval .= <<'END_MESSAGE';
-          hAxis: {slantedText:true, slantedTextAngle:45,
-              textStyle: {
-              fontSize: 10}
-              },
-          vAxis: {minValue: 0}
-        };
-
-        var my_div = document.getElementById('chart_div');
-        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
-        google.visualization.events.addListener(chart, 'ready', function () {
-        my_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
-    });
-
-        chart.draw(data, options);}
-    </script>
-END_MESSAGE
-    return $retval;
-}
 
 1;
 
