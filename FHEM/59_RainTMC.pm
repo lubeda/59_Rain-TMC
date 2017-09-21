@@ -85,7 +85,7 @@ sub RainTMC_Define($$) {
     my $name = $a[0];
 
     # alle fünf Minuten
-    my $interval = 60 * 4;
+    my $interval = 60 * 2;
 
     $hash->{INTERVAL}  = $interval;
     $hash->{LATITUDE}  = $latitude;
@@ -97,7 +97,7 @@ sub RainTMC_Define($$) {
     $hash->{READINGS}{rainBegin}{TIME} = TimeNow();
     $hash->{READINGS}{rainBegin}{VAL}  = "unknown";
     
-    $hash->{RAINDATA}  = "unknown";
+    $hash->{".rainData"}  = "unknown";
 
     $hash->{READINGS}{rainDataStart}{TIME} = TimeNow();
     $hash->{READINGS}{rainDataStart}{VAL}  = "unknown";
@@ -165,13 +165,13 @@ sub RainTMC_ParseHttpResponse($) {
         RainTMC_ScheduleUpdate($hash);
     }
     elsif ( $data ne "" ) {
-        Log3( $name, 3, "$name: returned: $data" );
+        
         my $decoded_json = decode_json($data);
         my $entry ;
-        Log3 ($name,3,$decoded_json->{ForecastResult});
+        
         foreach $entry ($decoded_json->{ForecastResult}) 
         {
-            Log3 ($name,3, Dumper($entry));
+            Log3 ($name,3, "Entry: " . Dumper($entry));
         }
                
         my $rainamount    = 0.0;
@@ -194,7 +194,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
-        readingsBulkUpdateIfChanged( $hash, "rainData", $rainData );
+        $hash->{".rainData"} = $rainData ;
         
         readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
         readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
@@ -215,7 +215,7 @@ sub RainTMC_logProxy($) {
     #$date5m->minutes=5;
 
     my @startdate =
-      ( split /:/, ReadingsVal( $name, "rainDataStart", "12:00" ) );
+      ( split /:/, $hash->{".rainData"} );
 
     $date->set( hour => $startdate[0], minute => $startdate[1], second => 0 );
     my $max = 0;
