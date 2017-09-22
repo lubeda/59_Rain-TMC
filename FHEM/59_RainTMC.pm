@@ -215,7 +215,7 @@ sub RainTMC_ParseHttpResponse($) {
             }
             my $logtime = FmtDateTime($timestamp);
             $logtime =~ tr/ /_/;
-            $logProxy .= SVG_time_to_sec($timestamp). " " . $rain."\r\n";
+            $logProxy .= $logtime . " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
         }
