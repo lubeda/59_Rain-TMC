@@ -187,7 +187,7 @@ sub RainTMC_ParseHttpResponse($) {
 
             my $timestamp = $a->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
-            $timestamp = $1/100;
+            $timestamp = $1/1000;
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
