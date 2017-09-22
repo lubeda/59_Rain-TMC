@@ -166,15 +166,8 @@ sub RainTMC_ParseHttpResponse($) {
     }
     elsif ( $data ne "" ) {
         
-        my $decoded_json = decode_json($data);
-        my $entry ;
-        
-        foreach $entry ($decoded_json->{ForecastResult}) 
-        {
-            Log3 ($name,3, "Array: " . $entry[0]->{value});
-        }
-        
-               
+        my $array = decode_json($data);
+                        
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
@@ -188,7 +181,42 @@ sub RainTMC_ParseHttpResponse($) {
         my $endchanged    = 0;
         my $endline       = 0;
         my $parse         = 1;
-        
+        my $l=0;
+        while ($array->{ForecastResult}[$l] != undef)
+        {
+            $rain = $array->{ForecastResult}[$l]->{Value};
+            $timestamp = $data->{ForecastResult}[$l]->{TimeStamp};
+            $timestamp =~ /\(([0-9]*)\)/ ;
+            $timestamp = $1;
+            $l +=1;
+            if ($l == 1){
+                $rainNow = $rain;
+                $rainDataStart = SVG_Date($timestamp);
+                $rainData = $rain;
+            }
+            if ($parse) {
+                if ($beginchanged) {
+                    if ( $rain > 0 ) {
+                        $rainend = $timestamp;
+                    }
+                    else {
+                        $rainend    = $timestamp;
+                        $endchanged = 1;
+                        $parse      = 0;      # Nur den ersten Schauer auswerten
+                    }
+                }
+                else {
+                    if ( $rain > 0 ) {
+                        $rainbegin    = $timestamp;
+                        $beginchanged = 1;
+                        $rainend      = $timestamp;
+                    }
+                }
+            }
+            $rainData .= ":" . $rain ;
+            $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
+        }
+
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
 
         readingsBeginUpdate($hash);
