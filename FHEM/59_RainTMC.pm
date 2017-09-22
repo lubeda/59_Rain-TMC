@@ -166,8 +166,6 @@ sub RainTMC_ParseHttpResponse($) {
     }
     elsif ( $data ne "" ) {
         
-        
-                        
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
