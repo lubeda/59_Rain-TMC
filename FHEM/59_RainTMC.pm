@@ -180,7 +180,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $l=0;
 
         my @array = @{$rainData->{ForecastResult}};
-
+        my $logProxy = "";
         foreach my $a (@array) {
 
             $rain = $a->{Value};
@@ -191,28 +191,29 @@ sub RainTMC_ParseHttpResponse($) {
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
-                $rainDataStart =$timestamp;
+                $rainDataStart =FmtDateTime($timestamp);
                 $rainData = $rain;
             }
             if ($parse) {
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
-                        $rainend = $timestamp;
+                        $rainend = FmtDateTime($timestamp);
                     }
                     else {
-                        $rainend    = $timestamp;
+                        $rainend    = FmtDateTime($timestamp);
                         $endchanged = 1;
                         $parse      = 0;      # Nur den ersten Schauer auswerten
                     }
                 }
                 else {
                     if ( $rain > 0 ) {
-                        $rainbegin    = $timestamp;
+                        $rainbegin    = FmtDateTime($timestamp);
                         $beginchanged = 1;
-                        $rainend      = $timestamp;
+                        $rainend      = FmtDateTime($timestamp);
                     }
                 }
             }
+            $logProxy .= replace(" ","_",$rainDataStart). " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
         }
@@ -224,7 +225,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
-        
+        $hash->{"logProxy"} = $logProxy;
         readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
         readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
         readingsBulkUpdateIfChanged( $hash, "rainEnd", $rainend, $endchanged );
@@ -234,54 +235,10 @@ sub RainTMC_ParseHttpResponse($) {
 
 sub RainTMC_logProxy($) {
     my ($name) = @_;
-    my @values = split /:/, ReadingsVal( $name, "rainData", "" );
-    my $hash   = $defs{$name};
-    my $date   = DateTime->now;
     my $ret;
 
-    my $date5m = DateTime::Duration->new( minutes => 5 );
-
-    #$date5m->minutes=5;
-
-    my @startdate =
-      ( split /:/, $hash->{".rainData"} );
-
-    $date->set( hour => $startdate[0], minute => $startdate[1], second => 0 );
-    my $max = 0;
-    foreach my $val (@values) {
-        $max = ( $val > $max ) ? $val : $max;
-        $ret .= $date->ymd . "_" . $date->hms . " " . $val . "\r\n";
-        $date += $date5m;
-    }
-
-    return ( $ret, 0, $max );
+    return ( $hash->{"logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
 }
-
-sub RainTMC_logProxyRaw($) {
-    my ($name) = @_;
-    my @values = split /:/, ReadingsVal( $name, "rainDataRaw", "" );
-    my $hash   = $defs{$name};
-    my $date   = DateTime->now;
-    my $ret;
-
-    my $date5m = DateTime::Duration->new( minutes => 5 );
-
-    #$date5m->minutes=5;
-
-    my @startdate =
-      ( split /:/, ReadingsVal( $name, "rainDataStart", "12:00" ) );
-
-    $date->set( hour => $startdate[0], minute => $startdate[1], second => 0 );
-    my $max = 0;
-    foreach my $val (@values) {
-        $max = ( $val > $max ) ? $val : $max;
-        $ret .= $date->ymd . "_" . $date->hms . " " . $val . "\r\n";
-        $date += $date5m;
-    }
-
-    return ( $ret, 0, $max );
-}
-
 
 1;
 
