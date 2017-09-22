@@ -173,6 +173,7 @@ sub RainTMC_ParseHttpResponse($) {
         {
             Log3 ($name,3, "Entry: " . Dumper($entry));
         }
+        
                
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
