@@ -185,7 +185,7 @@ sub RainTMC_ParseHttpResponse($) {
         while ($array->{ForecastResult}[$l] != undef)
         {
             $rain = $array->{ForecastResult}[$l]->{Value};
-            $timestamp = $data->{ForecastResult}[$l]->{TimeStamp};
+            my $timestamp = $data->{ForecastResult}[$l]->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
             $timestamp = $1;
             $l +=1;
