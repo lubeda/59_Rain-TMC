@@ -213,7 +213,7 @@ sub RainTMC_ParseHttpResponse($) {
                     }
                 }
             }
-            $logtime = FmtDateTime($timestamp)
+            $logtime = FmtDateTime($timestamp);
             $logtime =~ tr/ /_/;
             $logProxy .= SVG_time_to_sec($timestamp). " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
