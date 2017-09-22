@@ -181,7 +181,7 @@ sub RainTMC_ParseHttpResponse($) {
 
         my @array = @{$data->{ForecastResult}};
 
-        foreach my $a (@array)
+        foreach my $a (@array) {
 
             $rain = $a->{Value};
 
