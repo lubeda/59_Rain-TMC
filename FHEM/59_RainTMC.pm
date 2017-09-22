@@ -88,7 +88,7 @@ sub RainTMC_Define($$) {
     $hash->{INTERVAL}  = $interval;
     $hash->{LATITUDE}  = $latitude;
     $hash->{LONGITUDE} = $longitude;
-    $hash->{URL} ="https://api.themeteocompany.com/precipitation/getforecastbylatlon/?&radius=0&lat="
+    $hash->{URL} ="https://api.themeteocompany.com/precipitation/getforecastbylatlon/?radius=0&lat="
       . $hash->{LATITUDE} . "&lon="
       . $hash->{LONGITUDE};
     
