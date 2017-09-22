@@ -184,7 +184,9 @@ sub RainTMC_ParseHttpResponse($) {
         my @array = @{$data->{ForecastResult}};
 
         foreach my $a (@array)
+
             $rain = $a->{Value};
+
             my $timestamp = $a->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
             $timestamp = $1;
