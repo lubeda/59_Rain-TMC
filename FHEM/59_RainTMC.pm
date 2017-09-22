@@ -171,7 +171,7 @@ sub RainTMC_ParseHttpResponse($) {
         
         foreach $entry ($decoded_json->{ForecastResult}) 
         {
-            Log3 ($name,3, "Entry: " . Dumper($entry));
+            Log3 ($name,3, "Array: " . $entry[0]->{value});
         }
         
                
