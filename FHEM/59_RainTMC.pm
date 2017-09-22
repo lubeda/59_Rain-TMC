@@ -235,6 +235,7 @@ sub RainTMC_ParseHttpResponse($) {
 
 sub RainTMC_logProxy($) {
     my ($name) = @_;
+    my $hash   = $defs{$name};
     my $ret;
 
     return ( $hash->{"logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
