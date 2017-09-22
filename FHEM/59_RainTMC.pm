@@ -166,7 +166,7 @@ sub RainTMC_ParseHttpResponse($) {
     }
     elsif ( $data ne "" ) {
         
-        my $array = decode_json($data);
+        
                         
         my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
@@ -182,16 +182,18 @@ sub RainTMC_ParseHttpResponse($) {
         my $endline       = 0;
         my $parse         = 1;
         my $l=0;
-        while ($array->{ForecastResult}[$l] != undef)
-        {
-            $rain = $array->{ForecastResult}[$l]->{Value};
-            my $timestamp = $data->{ForecastResult}[$l]->{TimeStamp};
+
+        my @array = @{$data->{ForecastResult}};
+
+        foreach my $a (@array)
+            $rain = $a->{Value};
+            my $timestamp = $a->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
             $timestamp = $1;
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
-                $rainDataStart = SVG_Date($timestamp);
+                $rainDataStart =$timestamp;
                 $rainData = $rain;
             }
             if ($parse) {
