@@ -185,7 +185,7 @@ sub RainTMC_ParseHttpResponse($) {
 
         foreach my $a (@array)
 
-            $rain = $a->{Value};
+            $rain = $a{Value};
 
             my $timestamp = $a->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
