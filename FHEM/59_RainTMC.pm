@@ -163,12 +163,12 @@ sub RainTMC_ParseHttpResponse($) {
         RainTMC_ScheduleUpdate($hash);
     }
     elsif ( $data ne "" ) {
-        
-        my $rainamount    = 0.0;
+
+       my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
         my $rainDataStart = "unknown";
-        my $rainData      = "";
+        my $rainData      = decode_json($data);
         my $rainMax       = 0;
         my $rain          = 0;
         my $rainNow       = 0;
@@ -179,7 +179,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
 
-        my @array = @{$data->{ForecastResult}};
+        my @array = @{$rainData->{ForecastResult}};
 
         foreach my $a (@array) {
 
