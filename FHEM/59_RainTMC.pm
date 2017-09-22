@@ -213,7 +213,7 @@ sub RainTMC_ParseHttpResponse($) {
                     }
                 }
             }
-            $logProxy .= replace(" ","_",$rainDataStart). " " . $rain."\r\n";
+            $logProxy .= SVG_time_to_sec($timestamp). " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
         }
