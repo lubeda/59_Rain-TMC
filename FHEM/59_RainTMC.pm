@@ -27,10 +27,8 @@
 
 # V 1.0 release über Github
 
-
 package main;
 
-use Data::Dumper;
 use JSON;
 use strict;
 use warnings;
