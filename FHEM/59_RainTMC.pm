@@ -220,7 +220,7 @@ sub RainTMC_ParseHttpResponse($) {
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
-            $as_png .= "['". ( ( $l % 2 ) ? $timestamp : "" ) . "'," . $rain ."],";
+            $as_png .= "['". ( ( $l % 2 ) ? FmtDateTime($timestamp) : "" ) . "'," . $rain ."],";
 
         }
         
@@ -265,7 +265,7 @@ sub RainTMC_PNG($) {
       google.charts.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['string', 'mm/m² per h','raw'],
+          ['string', 'mm/m² per h'],
 END_MESSAGE
 
     $retval .= $defs{$name}->{".PNG"};
