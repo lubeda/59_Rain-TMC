@@ -291,7 +291,7 @@ END_MESSAGE
         var my_div = document.getElementById(
 END_MESSAGE
 
-    $retval .='"chart_div_'.$name.'");'
+    $retval .='"chart_div_'.$name.'");';
 
 $retval .= <<'END_MESSAGE';
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
