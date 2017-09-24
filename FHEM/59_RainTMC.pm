@@ -220,7 +220,7 @@ sub RainTMC_ParseHttpResponse($) {
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
-            $as_png .= "['". ( ( $l % 2 ) ? FmtDateTime($timestamp) : "" ) . "'," . $rain ."],";
+            $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
         }
         
         $as_png = substr( $as_png, 0, -1 );
