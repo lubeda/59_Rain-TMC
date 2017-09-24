@@ -256,10 +256,9 @@ sub RainTMC_PNG($) {
 <style>
 .chart_div {width:400px; height:310px;}
 </style>
-<div id="chart_div_
 END_MESSAGE
 
-$retval .= $name;
+$retval .= '<div id="chart_div_$name"; ';
 $retval .= <<'END_MESSAGE';
 " style="width:100%; height:100%"></div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
