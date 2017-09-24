@@ -288,7 +288,12 @@ END_MESSAGE
           vAxis: {minValue: 0}
         };
 
-        var my_div = document.getElementById('chart_div');
+        var my_div = document.getElementById(
+END_MESSAGE
+
+    $retval .='"chart_div_'.$name.'");'
+
+$retval .= <<'END_MESSAGE';
         var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
         google.visualization.events.addListener(chart, 'ready', function () {
         my_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
