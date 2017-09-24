@@ -178,6 +178,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $endline       = 0;
         my $parse         = 1;
         my $l=0;
+        my $as_png ="";
 
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
@@ -218,6 +219,10 @@ sub RainTMC_ParseHttpResponse($) {
             $logProxy .= $logtime . " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
+            
+            $as_png .= "['". ( ( $l % 2 ) ? $timestamp : "" ) . "'," . $rain ."],";
+        }
+        $as_png = substr( $as_png, 0, -1 );
         }
 
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
@@ -227,6 +232,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
+        $hash->{".PNG"} = $as_png;
         $hash->{"logProxy"} = $logProxy;
         readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
         readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
@@ -242,6 +248,55 @@ sub RainTMC_logProxy($) {
 
     return ( $hash->{"logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
 }
+
+sub RainTMC_PNG($) {
+    my ($name) = @_;
+    my $retval;
+    $retval = <<'END_MESSAGE';
+<style>
+.chart_div {width:400px; height:310px;}
+</style>
+<div id="chart_div" style="width:100%; height:100%"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+ <script type="text/javascript">
+
+     google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['string', 'mm/m² per h','raw'],
+END_MESSAGE
+
+    $retval .= $defs{$name}->{".PNG"};
+    $retval .= <<'END_MESSAGE';
+]);
+
+ var options = {
+          title: 'Niederschlag',
+END_MESSAGE
+    $retval .= "subtitle: 'Vorhersage (" . $name . ")',";
+
+    $retval .= <<'END_MESSAGE';
+          hAxis: {slantedText:true, slantedTextAngle:45,
+              textStyle: {
+              fontSize: 10}
+              },
+          vAxis: {minValue: 0}
+        };
+
+        var my_div = document.getElementById('chart_div');
+        var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+        google.visualization.events.addListener(chart, 'ready', function () {
+        my_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
+    });
+
+        chart.draw(data, options);}
+    </script>
+END_MESSAGE
+    return $retval;
+}
+
+
 
 1;
 
@@ -294,7 +349,7 @@ sub RainTMC_logProxy($) {
     <ul>
         <li><code>{RainTMC_HTML(<DEVICE>,<Pixel>)}</code> also z.B. {RainTMC_HTML("BR",500)} gibt eine reine HTML Liste zur&uuml;ck, der l&auml;ngste Balken hat dann 500 Pixel
             (nicht so schön ;-)) </li>
-        <li><code>{RainTMC_SVG(<DEVICE>)}</code>also z.B. {RainTMC_SVG("BR")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
+        <li><code>{RainTMC_PNG(<DEVICE>)}</code>also z.B. {RainTMC_PNG("BR")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
 <li><code> {RainTMC_logProxy(
         <DEVICE>)}</code>also z.B. {RainTMC_logProxy("BR")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
             und FTUI Charts erstellen.</li>        
