@@ -221,9 +221,10 @@ sub RainTMC_ParseHttpResponse($) {
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
             $as_png .= "['". ( ( $l % 2 ) ? $timestamp : "" ) . "'," . $rain ."],";
+
         }
+        
         $as_png = substr( $as_png, 0, -1 );
-        }
 
         $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
 
