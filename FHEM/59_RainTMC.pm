@@ -41,7 +41,25 @@ sub RainTMC_Initialize($) {
 
     $hash->{DefFn}       = "RainTMC_Define";
     $hash->{UndefFn}     = "RainTMC_Undef";
+    $hash->{GetFn}       = "RainTMC_Get";
     $hash->{AttrList}    = $readingFnAttributes;
+}
+
+###################################
+sub RainTMC_Get($$@) {
+
+    my ( $hash, $name, $opt, @args ) = @_;
+
+    return "\"get $name\" needs at least one argument" unless ( defined($opt) );
+
+    if ( $opt eq "refresh" ) {
+        RainTMC_RequestUpdate($hash);
+        return "";
+    }
+    else {
+        return
+"Unknown argument $opt, choose one of refresh";
+    }
 }
 
 #####################################
@@ -303,12 +321,17 @@ END_MESSAGE
 1;
 
 =pod
+
+=begin html
+Only german documantation available
+=end html
+
 =begin html_DE
 
 <a name="RainTMC"></a>
 <h3>RainTMC</h3>
 <ul>
-    <p>Niederschlagsvorhersage auf Basis von freien Wetterdaten <a href="">https://www.RainTMC.nl/overRainTMC/gratis-weerdata</a></p>
+    <p>Niederschlagsvorhersage auf Basis von Daten der Webseite <a href="https://api.themeteocompany.com/precipitation/">https://api.themeteocompany.com/precipitation/</a></p>
     <BR>
     <a name="RainTMCdefine"></a>
     <p><b>Define</b></p>
@@ -320,17 +343,7 @@ END_MESSAGE
     <ul>
         <p>Folgende Werte kann man mit get abfragen:</p>
         <li>
-
-            <p><code>rainDuration</code> Die voraussichtliche Dauer des n&auml;chsten Schauers in Minuten</p>
-        </li>
-        <li>
-            <p><code>startsIn</code> Der Regen beginnt in x Minuten</p>
-        </li>
-        <li>
-            <p><code>refresh</code> Neue Daten werde nonblocking abgefragt/</p>
-        </li>
-        <li>
-            <p><code>testVal</code> Rechnet einen RainTMC Wert in mm/m² um ( zu Testzwecken)</p>
+               <p><code>refresh</code> Forciert einen Datenabgleich</p>
         </li>
     </ul>
     <a name="RainTMCreadings"></a>
