@@ -55,10 +55,24 @@ sub RainTMC_Get($$@) {
     if ( $opt eq "refresh" ) {
         RainTMC_RequestUpdate($hash);
         return "";
+    }  elsif ( $opt eq "rainDuration" ) {
+        my $begin = $hash->{".rainBeginTS"}  ;
+        my $end = $hash->{".rainEndTS"} = ;
+        if ( $begin != $end ) {
+            return int() ($end - $begin)/60);
+        }
+    }  elsif ( $opt eq "startsIn" ) {
+        my $begin = $hash->{".rainBeginTS"}  ;
+        return int (($begin - localtime() )/60);
     }
     else {
-        return
-"Unknown argument $opt, choose one of refresh";
+            return "unknown";
+        }
+    }
+
+
+    else {
+        return "Unknown argument $opt, choose one of refresh";
     }
 }
 
@@ -258,6 +272,10 @@ sub RainTMC_ParseHttpResponse($) {
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
         $hash->{"logProxy"} = $logProxy;
+        
+        $hash->{".rainBeginTS"} = $rainbegints;
+        $hash->{".rainEndTS"} = $rainendts;
+             
         readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
         readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
         readingsBulkUpdateIfChanged( $hash, "rainEnd", $rainend, $endchanged );
