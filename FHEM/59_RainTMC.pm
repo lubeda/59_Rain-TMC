@@ -59,19 +59,12 @@ sub RainTMC_Get($$@) {
         my $begin = $hash->{".rainBeginTS"} ;
         my $end = $hash->{".rainEndTS"} ;
         if ( $begin != $end ) {
-            return int() ($end - $begin)/60);
+            return int( ($end - $begin)/60));
         }
     }  elsif ( $opt eq "startsIn" ) {
         my $begin = $hash->{".rainBeginTS"}  ;
         return int (($begin - localtime() )/60);
-    }
-    else {
-            return "unknown";
-        }
-    }
-
-
-    else {
+    } else {
         return "Unknown argument $opt, choose one of refresh startsIn rainDuration";
     }
 }
@@ -233,11 +226,11 @@ sub RainTMC_ParseHttpResponse($) {
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
                         $rainend = FmtDateTime($timestamp);
-                        $rainendts = $timestamp
+                        $rainendts = $timestamp;
                     }
                     else {
                         $rainend    = FmtDateTime($timestamp);
-                        $rainendts = $timestamp
+                        $rainendts = $timestamp;
                         $endchanged = 1;
                         $parse      = 0;      # Nur den ersten Schauer auswerten
                     }
@@ -245,8 +238,8 @@ sub RainTMC_ParseHttpResponse($) {
                 else {
                     if ( $rain > 0 ) {
                         $rainbegin    = FmtDateTime($timestamp);
-                        $rainbegints = $timestamp
-                        $rainendts = $timestamp
+                        $rainbegints = $timestamp;
+                        $rainendts = $timestamp;
                         $beginchanged = 1;
                         $rainend      = FmtDateTime($timestamp);
                     }
