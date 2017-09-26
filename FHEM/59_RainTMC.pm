@@ -56,8 +56,8 @@ sub RainTMC_Get($$@) {
         RainTMC_RequestUpdate($hash);
         return "";
     }  elsif ( $opt eq "rainDuration" ) {
-        my $begin = $hash->{".rainBeginTS"}  ;
-        my $end = $hash->{".rainEndTS"} = ;
+        my $begin = $hash->{".rainBeginTS"} ;
+        my $end = $hash->{".rainEndTS"} ;
         if ( $begin != $end ) {
             return int() ($end - $begin)/60);
         }
