@@ -185,6 +185,8 @@ sub RainTMC_ParseHttpResponse($) {
        my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
+        my $rainbegints     = 0;
+        my $rainendts       = 0;
         my $rainDataStart = "unknown";
         my $rainData      = decode_json($data);
         my $rainMax       = 0;
@@ -217,9 +219,11 @@ sub RainTMC_ParseHttpResponse($) {
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
                         $rainend = FmtDateTime($timestamp);
+                        $rainendts = $timestamp
                     }
                     else {
                         $rainend    = FmtDateTime($timestamp);
+                        $rainendts = $timestamp
                         $endchanged = 1;
                         $parse      = 0;      # Nur den ersten Schauer auswerten
                     }
@@ -227,6 +231,8 @@ sub RainTMC_ParseHttpResponse($) {
                 else {
                     if ( $rain > 0 ) {
                         $rainbegin    = FmtDateTime($timestamp);
+                        $rainbegints = $timestamp
+                        $rainendts = $timestamp
                         $beginchanged = 1;
                         $rainend      = FmtDateTime($timestamp);
                     }
@@ -243,7 +249,7 @@ sub RainTMC_ParseHttpResponse($) {
         
         $as_png = substr( $as_png, 0, -1 );
 
-        $hash->{STATE} = sprintf( "%.3f mm/h", $rainNow );
+        $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
         readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
@@ -279,7 +285,7 @@ $retval .= <<'END_MESSAGE';
       google.charts.setOnLoadCallback(drawChart);
       function drawChart() {
         var data = google.visualization.arrayToDataTable([
-          ['string', 'mm/m² per h'],
+          ['string', 'Regen'],
 END_MESSAGE
 
     $retval .= $defs{$name}->{".PNG"};
@@ -350,7 +356,7 @@ Only german documantation available
     <p><b>Readings</b></p>
     <p>Folgende Readings bietet das Modul:</p><br>
     <ul><li>
-            <code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall in mm/m² pro Stunden
+            <code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall
     </li>
     <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
 <li><code>rainBegin</code>Die Uhrzeit des kommenden
