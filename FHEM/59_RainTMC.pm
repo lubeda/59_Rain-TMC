@@ -72,7 +72,7 @@ sub RainTMC_Get($$@) {
 
 
     else {
-        return "Unknown argument $opt, choose one of refresh";
+        return "Unknown argument $opt, choose one of refresh startsIn rainDuration";
     }
 }
 
