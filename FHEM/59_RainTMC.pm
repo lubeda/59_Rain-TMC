@@ -270,7 +270,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
-        $hash->{"logProxy"} = $logProxy;
+        $hash->{".logProxy"} = $logProxy;
         
         $hash->{".rainBeginTS"} = $rainbegints;
         $hash->{".rainEndTS"} = $rainendts;
@@ -287,7 +287,7 @@ sub RainTMC_logProxy($) {
     my $hash   = $defs{$name};
     my $ret;
 
-    return ( $hash->{"logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
+    return ( $hash->{".logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
 }
 
 sub RainTMC_PNG($) {
@@ -339,8 +339,6 @@ END_MESSAGE
     return $retval;
 }
 
-
-
 1;
 
 =pod
@@ -374,6 +372,9 @@ Only german documantation available
     <p>Folgende Readings bietet das Modul:</p><br>
     <ul><li>
             <code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall
+    </li>
+    <li>
+            <code>rainMax</code> Die maximale Regenmenge f&uuml;r das gesammte Daten-Intervall
     </li>
     <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
 <li><code>rainBegin</code>Die Uhrzeit des kommenden
