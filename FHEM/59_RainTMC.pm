@@ -372,6 +372,9 @@ Only german documantation available
             <code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall
     </li>
     <li>
+            <code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen
+    </li>
+    <li>
             <code>rainMax</code> Die maximale Regenmenge f&uuml;r das gesammte Daten-Intervall
     </li>
     <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
