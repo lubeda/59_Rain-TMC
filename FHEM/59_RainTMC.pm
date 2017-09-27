@@ -65,6 +65,8 @@ sub RainTMC_Get($$@) {
         my $begin = $hash->{".rainBeginTS"}  ;
         if ($begin > localtime) {
             return int (($begin - localtime() )/60);
+        } elsif (ReadingsVal( $name, "rainNow", 0 )> 0 ) {
+            return "raining";
         } else {
             return "raining";
         }
