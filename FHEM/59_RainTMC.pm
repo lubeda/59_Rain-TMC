@@ -59,7 +59,7 @@ sub RainTMC_Get($$@) {
         my $begin = $hash->{".rainBeginTS"} ;
         my $end = $hash->{".rainEndTS"} ;
         if ( $begin != $end ) {
-            return int( ($end - $begin)/60));
+            return int(($end - $begin)/60);
         }
     }  elsif ( $opt eq "startsIn" ) {
         my $begin = $hash->{".rainBeginTS"}  ;
