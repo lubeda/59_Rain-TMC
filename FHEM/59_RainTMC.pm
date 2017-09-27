@@ -114,7 +114,7 @@ sub RainTMC_Define($$) {
     my $name = $a[0];
 
     # alle fünf Minuten
-    my $interval = 60 * 2;
+    my $interval = 60 * 4;
 
     $hash->{INTERVAL}  = $interval;
     $hash->{LATITUDE}  = $latitude;
@@ -257,7 +257,7 @@ sub RainTMC_ParseHttpResponse($) {
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
             $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
-        }
+        } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
 
