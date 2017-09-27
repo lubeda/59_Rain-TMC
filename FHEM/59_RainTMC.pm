@@ -195,7 +195,6 @@ sub RainTMC_ParseHttpResponse($) {
     }
     elsif ( $data ne "" ) {
 
-       my $rainamount    = 0.0;
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
         my $rainbegints     = 0;
@@ -265,7 +264,6 @@ sub RainTMC_ParseHttpResponse($) {
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
-        readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
