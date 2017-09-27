@@ -63,9 +63,13 @@ sub RainTMC_Get($$@) {
         }
     }  elsif ( $opt eq "startsIn" ) {
         my $begin = $hash->{".rainBeginTS"}  ;
-        return int (($begin - localtime() )/60);
+        if ($begin > localtime) {
+            return int (($begin - localtime() )/60);
+        } else {
+            return "raining";
+        }
     } else {
-        return "Unknown argument $opt, choose one of refresh startsIn rainDuration";
+        return "Unknown argument $opt, choose one of refresh:noArg startsIn:noArg rainDuration:noArg";
     }
 }
 
