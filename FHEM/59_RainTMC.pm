@@ -68,7 +68,7 @@ sub RainTMC_Get($$@) {
         } elsif (ReadingsVal( $name, "rainNow", 0 )> 0 ) {
             return "raining";
         } else {
-            return "raining";
+            return "unknown";
         }
     } else {
         return "Unknown argument $opt, choose one of refresh:noArg startsIn:noArg rainDuration:noArg";
@@ -215,12 +215,14 @@ sub RainTMC_ParseHttpResponse($) {
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
         foreach my $a (@array) {
-
+            
             $rain = $a->{Value};
 
             my $timestamp = $a->{TimeStamp};
             $timestamp =~ /\(([0-9]*)\)/ ;
             $timestamp = $1/1000;
+            
+            if ($timestamp > TimeNow()){
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
@@ -257,6 +259,7 @@ sub RainTMC_ParseHttpResponse($) {
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
             
             $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
+            }
         } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
@@ -341,8 +344,12 @@ END_MESSAGE
 
 =pod
 
+=item summary Rain prediction
+
+=item summary_DE Regenvorhersage auf Basis des Wetterdienstes https://www.themeteocompany.com
+
 =begin html
-Only german documantation available
+Only german documentation available
 =end html
 
 =begin html_DE
