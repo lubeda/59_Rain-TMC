@@ -58,13 +58,14 @@ sub RainTMC_Get($$@) {
     }  elsif ( $opt eq "rainDuration" ) {
         my $begin = $hash->{".rainBeginTS"} ;
         my $end = $hash->{".rainEndTS"} ;
+        Log3($name,3,"End: $end Neginf: $begin");
         if ( $begin != $end ) {
             return int(($end - $begin)/60);
         }
     }  elsif ( $opt eq "startsIn" ) {
         my $begin = $hash->{".rainBeginTS"}  ;
-        if ($begin > localtime) {
-            return int (($begin - localtime() )/60);
+        if ($begin > time()) {
+            return int (($begin - time() )/60);
         } elsif (ReadingsVal( $name, "rainNow", 0 )> 0 ) {
             return "raining";
         } else {
@@ -222,7 +223,7 @@ sub RainTMC_ParseHttpResponse($) {
             $timestamp =~ /\(([0-9]*)\)/ ;
             $timestamp = $1/1000;
             
-            if ($timestamp > TimeNow()){
+            if ($timestamp > time()){
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
