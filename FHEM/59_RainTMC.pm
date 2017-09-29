@@ -212,7 +212,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
         my $as_png ="";
-        my $as_html ="<table><tr style='border:1pt solid black'>";
+        my $as_html ="<table><tr style='border:2pt solid black'>";
 
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
