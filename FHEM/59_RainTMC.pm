@@ -212,7 +212,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
         my $as_png ="";
-        my $as_html ="<table><tr>";
+        my $as_html ="<table><tr style='border:1pt solid black'>";
 
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
@@ -225,7 +225,7 @@ sub RainTMC_ParseHttpResponse($) {
             $timestamp = $1/1000;
             
             if ($timestamp > time()){
-                if ($a->{ColorAsRGB} eq "") {
+                if ($a->{ColorAsRGB} eq "Transparent") {
                 $as_html .= "<td>-</td>";
                 } else{
                     $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
@@ -278,7 +278,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
-        $hash->{".HTML"} = $as_HTML;
+        $hash->{".HTML"} = $as_html;
         $hash->{".logProxy"} = $logProxy;
         
         $hash->{".rainBeginTS"} = $rainbegints;
@@ -304,7 +304,7 @@ sub RainTMC_HTML($) {
     my ($name) = @_;
     my $hash   = $defs{$name};
     
-    return ( $hash->{".HTML"};
+    return  $hash->{".HTML"};
 }
 
 
