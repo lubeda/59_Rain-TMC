@@ -212,7 +212,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
         my $as_png ="";
-        my $as_htmlhead ="<tr>";
+        my $as_htmlhead ='<tr style="font-size:x-small;"}>';
         my $as_html ="";
 
         my @array = @{$rainData->{ForecastResult}};
@@ -228,7 +228,7 @@ sub RainTMC_ParseHttpResponse($) {
             if ($timestamp > time()){
 
                 if (($l % 4) == 0 ) {
-                   $as_htmlhead .="<td>".substr(FmtDateTime($timestamp),-8,5)."</td>"
+                   $as_htmlhead .="<td >".substr(FmtDateTime($timestamp),-8,5)."</td>"
                 } else {
                      $as_htmlhead .= "<td>&nbsp;</td>"
                 }
