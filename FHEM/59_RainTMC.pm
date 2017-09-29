@@ -228,7 +228,7 @@ sub RainTMC_ParseHttpResponse($) {
                 if ($a->{ColorAsRGB} eq "") {
                 $as_html .= "<td>-</td>";
                 } else{
-                    $as_html .= "<td bgcolor=". $a->{ColorAsRGB} .">&nbsp;</td>";
+                    $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
                 }
             $l +=1;
             if ($l == 1){
