@@ -226,7 +226,7 @@ sub RainTMC_ParseHttpResponse($) {
             
             if ($timestamp > time()){
                 if ($a->{ColorAsRGB} eq "Transparent") {
-                $as_html .= "<td>-</td>";
+                $as_html .= "<td>&nbsp;</td>";
                 } else{
                     $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
                 }
