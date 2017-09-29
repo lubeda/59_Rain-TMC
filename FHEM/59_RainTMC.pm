@@ -212,6 +212,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
         my $as_png ="";
+        my $as_html ="<table><tr>";
 
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
@@ -224,6 +225,11 @@ sub RainTMC_ParseHttpResponse($) {
             $timestamp = $1/1000;
             
             if ($timestamp > time()){
+                if ($a->{ColorAsRGB} eq "") {
+                $as_html .= "<td>-</td>";
+                } else{
+                    $as_html .= "<td bgcolor=". $a->{ColorAsRGB} .">&nbsp;</td>";
+                }
             $l +=1;
             if ($l == 1){
                 $rainNow = $rain;
@@ -264,7 +270,7 @@ sub RainTMC_ParseHttpResponse($) {
         } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
-
+        $as_html .= "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
@@ -272,6 +278,7 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
+        $hash->{".HTML"} = $as_HTML;
         $hash->{".logProxy"} = $logProxy;
         
         $hash->{".rainBeginTS"} = $rainbegints;
@@ -291,6 +298,15 @@ sub RainTMC_logProxy($) {
 
     return ( $hash->{".logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
 }
+
+
+sub RainTMC_HTML($) {
+    my ($name) = @_;
+    my $hash   = $defs{$name};
+    
+    return ( $hash->{".HTML"};
+}
+
 
 sub RainTMC_PNG($) {
     my ($name) = @_;
