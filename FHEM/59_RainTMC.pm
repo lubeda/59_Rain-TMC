@@ -212,7 +212,8 @@ sub RainTMC_ParseHttpResponse($) {
         my $parse         = 1;
         my $l=0;
         my $as_png ="";
-        my $as_html ="<table><tr style='border:2pt solid black'>";
+        my $as_htmlhead ="<tr>";
+        my $as_html ="";
 
         my @array = @{$rainData->{ForecastResult}};
         my $logProxy = "";
@@ -225,6 +226,12 @@ sub RainTMC_ParseHttpResponse($) {
             $timestamp = $1/1000;
             
             if ($timestamp > time()){
+
+                if (($l % 4) == 0 ) {
+                   $as_htmlhead .="<td>".substr(FmtDateTime($timestamp),-8,5)."</td>"
+                } else {
+                     $as_htmlhead .= "<td>&nbsp;</td>"
+                }
                 if ($a->{ColorAsRGB} eq "Transparent") {
                 $as_html .= "<td>&nbsp;</td>";
                 } else{
@@ -270,7 +277,7 @@ sub RainTMC_ParseHttpResponse($) {
         } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
-        $as_html .= "</tr></table>";
+        $as_html ="<table><tr style='border:2pt solid black'>" . $as_htmlhead."</TR>". $as_html. "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
