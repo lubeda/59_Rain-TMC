@@ -203,6 +203,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $rainDataStart = "unknown";
         my $rainData      = decode_json($data);
         my $rainMax       = 0;
+        my $rainamount    = 0;
         my $rain          = 0;
         my $rainNow       = 0;
         my $line          = 0;
@@ -244,6 +245,7 @@ sub RainTMC_ParseHttpResponse($) {
                 $rainData = $rain;
             }
             if ($parse) {
+                $rainamount += $rain;
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
                         $rainend = FmtDateTime($timestamp);
@@ -282,6 +284,7 @@ sub RainTMC_ParseHttpResponse($) {
 
         readingsBeginUpdate($hash);
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
+        readingsBulkUpdateIfChanged( $hash, "rainAmount", $rainamount );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
