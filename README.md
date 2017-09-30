@@ -23,7 +23,6 @@ Die Geokoordinaten können weg gelassen werden falls es eine entsprechende Defin
 * `rainBegin` Die Uhrzeit des kommenden Regenbegins oder "unknown"
 * `rainEnd` Die Uhrzeit des kommenden Regenendes oder "unknown"
 
-    
 ## Visualisierung
     
 Zur Visualisierung gibt es drei Funktionen:

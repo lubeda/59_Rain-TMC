@@ -233,7 +233,7 @@ sub RainTMC_ParseHttpResponse($) {
                      $as_htmlhead .= "<td>&nbsp;</td>"
                 }
                 if (($a->{ColorAsRGB} eq "Transparent")||($rain==0)) {
-                $as_html .= "<td>&nbsp;</td>";
+                $as_html .= '<td bgcolor=#ffffff">&nbsp;</td>';
                 } else{
                     $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
                 }
