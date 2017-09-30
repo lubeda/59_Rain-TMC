@@ -384,49 +384,32 @@ Only german documentation available
 <a name="RainTMC"></a>
 <h3>RainTMC</h3>
 <ul>
-    <p>Niederschlagsvorhersage auf Basis von Daten der Webseite <a href="https://api.themeteocompany.com/precipitation/">https://api.themeteocompany.com/precipitation/</a></p>
-    <BR>
-    <a name="RainTMCdefine"></a>
-    <p><b>Define</b></p>
-    <ul>
-        <p><code>define &lt;name&gt; RainTMC &lt;Logitudename&gt; &lt;Latitude&gt;</code></p>
-    </ul>
-    <a name="RainTMCget"></a>
-    <p><b>Get</b></p>
-    <ul>
-        <p>Folgende Werte kann man mit get abfragen:</p>
-        <li>
-               <p><code>refresh</code> Forciert einen Datenabgleich</p>
-        </li>
-    </ul>
-    <a name="RainTMCreadings"></a>
-    <p><b>Readings</b></p>
-    <p>Folgende Readings bietet das Modul:</p><br>
-    <ul><li>
-            <code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall
-    </li>
-    <li>
-            <code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen
-    </li>
-    <li>
-            <code>rainMax</code> Die maximale Regenmenge f&uuml;r das gesammte Daten-Intervall
-    </li>
-    <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
-<li><code>rainBegin</code>Die Uhrzeit des kommenden
-    Regenbegins oder "unknown"</li>    
-    <li><code>rainEnd</code>Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
+<p>Niederschlagsvorhersage auf Basis von Wetterdaten von <a href="https://www.themeteocompany.com/">The Meteo Company</a></p>
+<h2><a href="#define" aria-hidden="true" class="anchor" id="user-content-define"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Define</h2>
+<p><code>define &lt;name&gt; RainTMC &lt;Logitude&gt; &lt;Latitude&gt;</code></p>
+<p>Die Geokoordinaten können weg gelassen werden falls es eine entsprechende Definition im <code>global</code> Device gibt.</p>
+<h2><a href="#get" aria-hidden="true" class="anchor" id="user-content-get"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Get</h2>
+<ul>
+<li><code>rainDuration</code> Die voraussichtliche Dauer des nächsten Schauers in Minuten</li>
+<li><code>startsIn</code> Der Regen beginnt in x Minuten</li>
+<li><code>refresh</code> Neue Daten werde nonblocking abgefragt</li>
 </ul>
-<a name="RainTMCfunctions"></a>
-<p><b>Funktionen</b></p>
-
-    <p>Zur Visualisierung gibt es drei Funktionen:</p> 
-    <ul>
-        <li><code>{RainTMC_HTML(	&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_HTML("R")} gibt eine HTML Tabelle zur&uuml;ck. </li>
-        <li><code>{RainTMC_PNG(	&lt;DEVICE&gt;)}</code>also z.B. {RainTMC_PNG("R")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
-<li><code> {RainTMC_logProxy(
-        	&lt;DEVICE&gt;)}</code>also z.B. {RainTMC_logProxy("R")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
-            und FTUI Charts erstellen.</li>        
-        </ul> 
+<h2><a href="#readings" aria-hidden="true" class="anchor" id="user-content-readings"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Readings</h2>
+<ul>
+<li><code>rainMax</code> Die maximale Regenmenge für ein 5 Min. Intervall auf Basis der vorliegenden Daten.</li>
+<li><code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen</li>
+<li><code>rainNow</code> Die vorhergesagte Regenmenge für das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
+<li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
+<li><code>rainBegin</code> Die Uhrzeit des kommenden Regenbegins oder "unknown"</li>
+<li><code>rainEnd</code> Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
+</ul>
+<h2><a href="#visualisierung" aria-hidden="true" class="anchor" id="user-content-visualisierung"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Visualisierung</h2>
+<p>Zur Visualisierung gibt es drei Funktionen:</p>
+<ul>
+<li><code>{RainTMC_HTML(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_HTML("R")} gibt einen HTML Balken mit einer farblichen Representation der Regenmenge aus.</li>
+<li><code>{RainTMC_PNG(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_PNG("R")} gibt eine mit der google Charts API generierte Grafik zurück</li>
+<li><code>{RainTMC_logProxy(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_logProxy("R")} kann in Verbindung mit einem Logproxy Device die typischen FHEM und FTUI Charts erstellen.</li>
+</ul>
 </ul>
 
 =end html_DE
