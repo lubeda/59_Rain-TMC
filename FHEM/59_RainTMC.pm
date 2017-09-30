@@ -279,7 +279,7 @@ sub RainTMC_ParseHttpResponse($) {
         } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
-        $as_html ="<table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
+        $as_html ="Niederschlagsvorhersage (<a href=./fhem?detail=$name>$name</a>)<BR><table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
