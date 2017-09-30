@@ -232,7 +232,7 @@ sub RainTMC_ParseHttpResponse($) {
                 } else {
                      $as_htmlhead .= "<td>&nbsp;</td>"
                 }
-                if ($a->{ColorAsRGB} eq "Transparent") {
+                if (($a->{ColorAsRGB} eq "Transparent")||($rain==0)) {
                 $as_html .= "<td>&nbsp;</td>";
                 } else{
                     $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
@@ -277,7 +277,7 @@ sub RainTMC_ParseHttpResponse($) {
         } # End foreach
         
         $as_png = substr( $as_png, 0, -1 );
-        $as_html ="<table><tr style='border:2pt solid black'>" . $as_htmlhead."</TR>". $as_html. "</tr></table>";
+        $as_html ="<table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
