@@ -421,11 +421,10 @@ Only german documentation available
 
     <p>Zur Visualisierung gibt es drei Funktionen:</p> 
     <ul>
-        <li><code>{RainTMC_HTML(<DEVICE>,<Pixel>)}</code> also z.B. {RainTMC_HTML("BR",500)} gibt eine reine HTML Liste zur&uuml;ck, der l&auml;ngste Balken hat dann 500 Pixel
-            (nicht so schön ;-)) </li>
-        <li><code>{RainTMC_PNG(<DEVICE>)}</code>also z.B. {RainTMC_PNG("BR")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
+        <li><code>{RainTMC_HTML(	&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_HTML("R")} gibt eine HTML Tabelle zur&uuml;ck. </li>
+        <li><code>{RainTMC_PNG(	&lt;DEVICE&gt;)}</code>also z.B. {RainTMC_PNG("R")} gibt eine mit der google Charts API generierte Grafik zur&uuml;ck</li>
 <li><code> {RainTMC_logProxy(
-        <DEVICE>)}</code>also z.B. {RainTMC_logProxy("BR")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
+        	&lt;DEVICE&gt;)}</code>also z.B. {RainTMC_logProxy("R")} kann in Verbindung mit einem Logproxy Device die typischen FHEM
             und FTUI Charts erstellen.</li>        
         </ul> 
 </ul>
