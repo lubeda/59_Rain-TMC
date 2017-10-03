@@ -201,9 +201,11 @@ sub RainTMC_ParseHttpResponse($) {
         my $rainbegints     = 0;
         my $rainendts       = 0;
         my $rainDataStart = "unknown";
+        my $rainDataEnd = "unknown";
         my $rainData      = decode_json($data);
         my $rainMax       = 0;
         my $rainamount    = 0;
+        my $rainLaMetric  = "";
         my $rain          = 0;
         my $rainNow       = 0;
         my $line          = 0;
@@ -244,6 +246,10 @@ sub RainTMC_ParseHttpResponse($) {
                 $rainDataStart =FmtDateTime($timestamp);
                 $rainData = $rain;
             }
+            if ($l < 13)
+            {
+                $rainLaMetric .= int ($rain * 1000) . "," ;
+            }
             if ($parse) {
                 $rainamount += $rain;
                 if ($beginchanged) {
@@ -267,25 +273,29 @@ sub RainTMC_ParseHttpResponse($) {
                         $rainend      = FmtDateTime($timestamp);
                     }
                 }
+               
             }
             my $logtime = FmtDateTime($timestamp);
             $logtime =~ tr/ /_/;
             $logProxy .= $logtime . " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
-            
+            $rainDataEnd =FmtDateTime($timestamp);
             $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
             }
         } # End foreach
         
+        $rainLaMetric = substr( $rainLaMetric, 0, -1 );
         $as_png = substr( $as_png, 0, -1 );
         $as_html ="Niederschlagsvorhersage (<a href=./fhem?detail=$name>$name</a>)<BR><table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
+        readingsBulkUpdateIfChanged( $hash, "rainLaMetric", $rainLaMetric );
         readingsBulkUpdateIfChanged( $hash, "rainAmount", $rainamount );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
+        readingsBulkUpdateIfChanged( $hash, "rainDataEnd", $rainDataEnd );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
         $hash->{".HTML"} = $as_html;
