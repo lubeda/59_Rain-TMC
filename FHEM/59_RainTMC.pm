@@ -389,7 +389,9 @@ END_MESSAGE
 =item summary_DE Regenvorhersage auf Basis des Wetterdienstes https://www.themeteocompany.com
 
 =begin html
+
 Only german documentation available
+
 =end html
 
 =begin html_DE
