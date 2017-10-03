@@ -208,6 +208,7 @@ sub RainTMC_ParseHttpResponse($) {
         my $rainLaMetric  = "";
         my $rain          = 0;
         my $rainNow       = 0;
+        my $rainTotal     = 0;
         my $line          = 0;
         my $beginchanged  = 0;
         my $endchanged    = 0;
@@ -250,8 +251,9 @@ sub RainTMC_ParseHttpResponse($) {
             {
                 $rainLaMetric .= int ($rain * 1000) . "," ;
             }
+            $rainTotal += $rain/12;
             if ($parse) {
-                $rainamount += $rain;
+                $rainamount += $rain/12; 
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
                         $rainend = FmtDateTime($timestamp);
@@ -293,7 +295,8 @@ sub RainTMC_ParseHttpResponse($) {
         readingsBeginUpdate($hash);
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainLaMetric", $rainLaMetric );
-        readingsBulkUpdateIfChanged( $hash, "rainAmount", $rainamount );
+        readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
+        readingsBulkUpdateIfChanged( $hash, "rainTotal",sprintf( "%.3f", $rainTotal * 12 ) );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
         readingsBulkUpdateIfChanged( $hash, "rainDataEnd", $rainDataEnd );
         $hash->{".rainData"} = $rainData ;
@@ -410,6 +413,9 @@ Only german documentation available
 <li><code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen</li>
 <li><code>rainNow</code> Die vorhergesagte Regenmenge für das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
 <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
+<li><code>rainDataEnd</code> Ende der Regenvorhersage</li>
+<li><code>rainTotal</code> Die Regenmenge die in dem Vorhersage enthalten ist</li>
+<li><code>rainLametric</code> Die näcshten 12 Regenmengen aufbereitet für ein LaMetric Display</li>
 <li><code>rainBegin</code> Die Uhrzeit des kommenden Regenbegins oder "unknown"</li>
 <li><code>rainEnd</code> Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
 </ul>
