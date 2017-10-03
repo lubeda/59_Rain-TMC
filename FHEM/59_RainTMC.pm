@@ -400,10 +400,10 @@ Only german documentation available
 <p>Niederschlagsvorhersage auf Basis von Wetterdaten von <a href="https://www.themeteocompany.com/">The Meteo Company</a></p>
 <h3>Define</h3>
 <p><code>define &lt;name&gt; RainTMC &lt;Logitude&gt; &lt;Latitude&gt;</code></p>
-<p>Die Geokoordinaten können weg gelassen werden falls es eine entsprechende Definition im <code>global</code> Device gibt.</p>
+<p>Die Geokoordinaten k&ouml;nnen weg gelassen werden falls es eine entsprechende Definition im <code>global</code> Device gibt.</p>
 <h3>Get</h3>
 <ul>
-<li><code>rainDuration</code> Die voraussichtliche Dauer des nächsten Schauers in Minuten</li>
+<li><code>rainDuration</code> Die voraussichtliche Dauer des n&auml;chsten Schauers in Minuten</li>
 <li><code>startsIn</code> Der Regen beginnt in x Minuten</li>
 <li><code>refresh</code> Neue Daten werde nonblocking abgefragt</li>
 </ul>
@@ -411,17 +411,17 @@ Only german documentation available
 <ul>
 <li><code>rainMax</code> Die maximale Regenmenge für ein 5 Min. Intervall auf Basis der vorliegenden Daten.</li>
 <li><code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen</li>
-<li><code>rainNow</code> Die vorhergesagte Regenmenge für das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
+<li><code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
 <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
 <li><code>rainDataEnd</code> Ende der Regenvorhersage</li>
 <li><code>rainTotal</code> Die Regenmenge die in dem Vorhersage enthalten ist</li>
-<li><code>rainLametric</code> Die nächsten 12 Regenmengen aufbereitet für ein LaMetric Display</li>
+<li><code>rainLametric</code> Die nächsten 12 Regenmengen aufbereitet f&uuml;r ein LaMetric Display</li>
 <li><code>rainBegin</code> Die Uhrzeit des kommenden Regenbegins oder "unknown"</li>
 <li><code>rainEnd</code> Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
 </ul>
 <h3>Visualisierung</h3>
 <p>Zur Visualisierung gibt es drei Funktionen:</p>
-<p>Die Funktionen <code>RainTMC_HTML</code> und <code>RainTMC_PNG</code> können im FHEMWEB verwendet werden. Die Funktion <code>RainTMC_logProxy</code> kann in Verbindung mit SVG oder im FTUI vorzugsweise mit dem Highchart Widget eingesetzt werden.</P>
+<p>Die Funktionen <code>RainTMC_HTML</code> und <code>RainTMC_PNG</code> k&ouml;nnen im FHEMWEB verwendet werden. Die Funktion <code>RainTMC_logProxy</code> kann in Verbindung mit SVG oder im FTUI vorzugsweise mit dem Highchart Widget eingesetzt werden.</P>
 <ul>
 <li><code>{RainTMC_HTML(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_HTML("R")} gibt einen HTML Balken mit einer farblichen Representation der Regenmenge aus.</li>
 <li><code>{RainTMC_PNG(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_PNG("R")} gibt eine mit der google Charts API generierte Grafik zurück</li>
