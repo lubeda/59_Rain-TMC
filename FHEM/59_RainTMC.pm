@@ -201,11 +201,14 @@ sub RainTMC_ParseHttpResponse($) {
         my $rainbegints     = 0;
         my $rainendts       = 0;
         my $rainDataStart = "unknown";
+        my $rainDataEnd = "unknown";
         my $rainData      = decode_json($data);
         my $rainMax       = 0;
         my $rainamount    = 0;
+        my $rainLaMetric  = "";
         my $rain          = 0;
         my $rainNow       = 0;
+        my $rainTotal     = 0;
         my $line          = 0;
         my $beginchanged  = 0;
         my $endchanged    = 0;
@@ -244,8 +247,13 @@ sub RainTMC_ParseHttpResponse($) {
                 $rainDataStart =FmtDateTime($timestamp);
                 $rainData = $rain;
             }
+            if ($l < 13)
+            {
+                $rainLaMetric .= int ($rain * 1000) . "," ;
+            }
+            $rainTotal += $rain/12;
             if ($parse) {
-                $rainamount += $rain;
+                $rainamount += $rain/12; 
                 if ($beginchanged) {
                     if ( $rain > 0 ) {
                         $rainend = FmtDateTime($timestamp);
@@ -267,25 +275,30 @@ sub RainTMC_ParseHttpResponse($) {
                         $rainend      = FmtDateTime($timestamp);
                     }
                 }
+               
             }
             my $logtime = FmtDateTime($timestamp);
             $logtime =~ tr/ /_/;
             $logProxy .= $logtime . " " . $rain."\r\n";
             $rainData .= ":" . $rain ;
             $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
-            
+            $rainDataEnd =FmtDateTime($timestamp);
             $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
             }
         } # End foreach
         
+        $rainLaMetric = substr( $rainLaMetric, 0, -1 );
         $as_png = substr( $as_png, 0, -1 );
         $as_html ="Niederschlagsvorhersage (<a href=./fhem?detail=$name>$name</a>)<BR><table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
         readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
-        readingsBulkUpdateIfChanged( $hash, "rainAmount", $rainamount );
+        readingsBulkUpdateIfChanged( $hash, "rainLaMetric", $rainLaMetric );
+        readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
+        readingsBulkUpdateIfChanged( $hash, "rainTotal",sprintf( "%.3f", $rainTotal * 12 ) );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
+        readingsBulkUpdateIfChanged( $hash, "rainDataEnd", $rainDataEnd );
         $hash->{".rainData"} = $rainData ;
         $hash->{".PNG"} = $as_png;
         $hash->{".HTML"} = $as_html;
@@ -376,35 +389,41 @@ END_MESSAGE
 =item summary_DE Regenvorhersage auf Basis des Wetterdienstes https://www.themeteocompany.com
 
 =begin html
+
 Only german documentation available
+
 =end html
 
 =begin html_DE
 
 <a name="RainTMC"></a>
-<h3>RainTMC</h3>
+<h2>RainTMC</h2>
 <ul>
 <p>Niederschlagsvorhersage auf Basis von Wetterdaten von <a href="https://www.themeteocompany.com/">The Meteo Company</a></p>
-<h2>Define</h2>
+<h3>Define</h3>
 <p><code>define &lt;name&gt; RainTMC &lt;Logitude&gt; &lt;Latitude&gt;</code></p>
-<p>Die Geokoordinaten können weg gelassen werden falls es eine entsprechende Definition im <code>global</code> Device gibt.</p>
-<h2><a href="#get" aria-hidden="true" class="anchor" id="user-content-get"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Get</h2>
+<p>Die Geokoordinaten k&ouml;nnen weg gelassen werden falls es eine entsprechende Definition im <code>global</code> Device gibt.</p>
+<h3>Get</h3>
 <ul>
-<li><code>rainDuration</code> Die voraussichtliche Dauer des nächsten Schauers in Minuten</li>
+<li><code>rainDuration</code> Die voraussichtliche Dauer des n&auml;chsten Schauers in Minuten</li>
 <li><code>startsIn</code> Der Regen beginnt in x Minuten</li>
 <li><code>refresh</code> Neue Daten werde nonblocking abgefragt</li>
 </ul>
-<h2>Readings</h2>
+<h3>Readings</h3>
 <ul>
 <li><code>rainMax</code> Die maximale Regenmenge für ein 5 Min. Intervall auf Basis der vorliegenden Daten.</li>
 <li><code>rainDataStart</code> Begin der aktuellen Regenvorhersage. Triggert das Update der Graphen</li>
-<li><code>rainNow</code> Die vorhergesagte Regenmenge für das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
+<li><code>rainNow</code> Die vorhergesagte Regenmenge f&uuml;r das aktuelle 5 Min. Intervall in mm/m² pro Stunden</li>
 <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
+<li><code>rainDataEnd</code> Ende der Regenvorhersage</li>
+<li><code>rainTotal</code> Die Regenmenge die in dem Vorhersage enthalten ist</li>
+<li><code>rainLametric</code> Die nächsten 12 Regenmengen aufbereitet f&uuml;r ein LaMetric Display</li>
 <li><code>rainBegin</code> Die Uhrzeit des kommenden Regenbegins oder "unknown"</li>
 <li><code>rainEnd</code> Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
 </ul>
-<h2>Visualisierung</h2>
+<h3>Visualisierung</h3>
 <p>Zur Visualisierung gibt es drei Funktionen:</p>
+<p>Die Funktionen <code>RainTMC_HTML</code> und <code>RainTMC_PNG</code> k&ouml;nnen im FHEMWEB verwendet werden. Die Funktion <code>RainTMC_logProxy</code> kann in Verbindung mit SVG oder im FTUI vorzugsweise mit dem Highchart Widget eingesetzt werden.</P>
 <ul>
 <li><code>{RainTMC_HTML(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_HTML("R")} gibt einen HTML Balken mit einer farblichen Representation der Regenmenge aus.</li>
 <li><code>{RainTMC_PNG(&lt;DEVICE&gt;)}</code> also z.B. {RainTMC_PNG("R")} gibt eine mit der google Charts API generierte Grafik zurück</li>
