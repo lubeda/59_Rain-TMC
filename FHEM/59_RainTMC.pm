@@ -415,7 +415,7 @@ Only german documentation available
 <li><code>rainAmount</code> Die Regenmenge die im kommenden Regenschauer herunterkommen soll</li>
 <li><code>rainDataEnd</code> Ende der Regenvorhersage</li>
 <li><code>rainTotal</code> Die Regenmenge die in dem Vorhersage enthalten ist</li>
-<li><code>rainLametric</code> Die näcshten 12 Regenmengen aufbereitet für ein LaMetric Display</li>
+<li><code>rainLametric</code> Die nächsten 12 Regenmengen aufbereitet für ein LaMetric Display</li>
 <li><code>rainBegin</code> Die Uhrzeit des kommenden Regenbegins oder "unknown"</li>
 <li><code>rainEnd</code> Die Uhrzeit des kommenden Regenendes oder "unknown"</li>
 </ul>
