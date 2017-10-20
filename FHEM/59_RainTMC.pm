@@ -39,10 +39,30 @@ sub RainTMC_Initialize($) {
 
     my ($hash) = @_;
 
-    $hash->{DefFn}       = "RainTMC_Define";
-    $hash->{UndefFn}     = "RainTMC_Undef";
-    $hash->{GetFn}       = "RainTMC_Get";
-    $hash->{AttrList}    = $readingFnAttributes;
+    $hash->{DefFn}    = "RainTMC_Define";
+    $hash->{UndefFn}  = "RainTMC_Undef";
+    $hash->{GetFn}    = "RainTMC_Get";
+    #  $hash->{AttrFn}   = "RainTMC_Attr";
+    $hash->{AttrList} = "radius:0,1,2,3 " .$readingFnAttributes;
+}
+
+
+sub RainTMC_Attr(@) {
+	my ( $cmd, $name, $attrName, $attrValue ) = @_;
+    
+  	# $cmd  - Vorgangsart - kann die Werte "del" (löschen) oder "set" (setzen) annehmen
+	# $name - Gerätename
+	# $attrName/$attrValue sind Attribut-Name und Attribut-Wert
+    
+	if ($cmd eq "set") {
+		if ($attrName eq "radius") {
+			if (int ($attrValue) == $attrValue)
+            {
+                return undef;
+            }
+		}
+	}
+    return "Error! Try: attr $name radius 0";
 }
 
 ###################################
@@ -55,24 +75,30 @@ sub RainTMC_Get($$@) {
     if ( $opt eq "refresh" ) {
         RainTMC_RequestUpdate($hash);
         return "";
-    }  elsif ( $opt eq "rainDuration" ) {
-        my $begin = $hash->{".rainBeginTS"} ;
-        my $end = $hash->{".rainEndTS"} ;
-        Log3($name,3,"End: $end Neginf: $begin");
+    }
+    elsif ( $opt eq "rainDuration" ) {
+        my $begin = $hash->{".rainBeginTS"};
+        my $end   = $hash->{".rainEndTS"};
+        Log3( $name, 3, "End: $end Neginf: $begin" );
         if ( $begin != $end ) {
-            return int(($end - $begin)/60);
+            return int( ( $end - $begin ) / 60 );
         }
-    }  elsif ( $opt eq "startsIn" ) {
-        my $begin = $hash->{".rainBeginTS"}  ;
-        if ($begin > time()) {
-            return int (($begin - time() )/60);
-        } elsif (ReadingsVal( $name, "rainNow", 0 )> 0 ) {
+    }
+    elsif ( $opt eq "startsIn" ) {
+        my $begin = $hash->{".rainBeginTS"};
+        if ( $begin > time() ) {
+            return int( ( $begin - time() ) / 60 );
+        }
+        elsif ( ReadingsVal( $name, "rainNow", 0 ) > 0 ) {
             return "raining";
-        } else {
+        }
+        else {
             return "unknown";
         }
-    } else {
-        return "Unknown argument $opt, choose one of refresh:noArg startsIn:noArg rainDuration:noArg";
+    }
+    else {
+        return
+"Unknown argument $opt, choose one of refresh:noArg startsIn:noArg rainDuration:noArg";
     }
 }
 
@@ -84,7 +110,6 @@ sub RainTMC_Undef($$) {
     RemoveInternalTimer($hash);
     return undef;
 }
-
 
 #####################################
 sub RainTMC_Define($$) {
@@ -106,8 +131,7 @@ sub RainTMC_Define($$) {
     }
     else {
         return
-          int(@a)
-          . " <=syntax: define <name> RainTMC [<latitude> <longitude>]";
+          int(@a) . " <=syntax: define <name> RainTMC [<latitude> <longitude>]";
     }
 
     $hash->{STATE} = "Initialized";
@@ -120,31 +144,31 @@ sub RainTMC_Define($$) {
     $hash->{INTERVAL}  = $interval;
     $hash->{LATITUDE}  = $latitude;
     $hash->{LONGITUDE} = $longitude;
-    $hash->{URL} ="https://api.themeteocompany.com/precipitation/getforecastbylatlon/?radius=0&lat="
-      . $hash->{LATITUDE} . "&lon="
-      . $hash->{LONGITUDE};
-    
+    $hash->{URL} = "https://api.themeteocompany.com/precipitation/getforecastbylatlon/?radius=" . AttrVal($name, "radius", 0) ."&lat=" 
+      . $hash->{LATITUDE} . "&lon=" . $hash->{LONGITUDE};
+
     $hash->{READINGS}{rainBegin}{TIME} = TimeNow();
     $hash->{READINGS}{rainBegin}{VAL}  = "unknown";
-    
-    $hash->{".rainData"}  = "unknown";
+
+    $hash->{".rainData"} = "unknown";
 
     $hash->{READINGS}{rainDataStart}{TIME} = TimeNow();
     $hash->{READINGS}{rainDataStart}{VAL}  = "unknown";
 
-    $hash->{READINGS}{rainNow}{TIME}    = TimeNow();
-    $hash->{READINGS}{rainNow}{VAL}     = "unknown";
-    
-    $hash->{READINGS}{rainEnd}{TIME}    = TimeNow();
-    $hash->{READINGS}{rainEnd}{VAL}     = "unknown";
-    
+    $hash->{READINGS}{rainNow}{TIME} = TimeNow();
+    $hash->{READINGS}{rainNow}{VAL}  = "unknown";
+
+    $hash->{READINGS}{rainEnd}{TIME} = TimeNow();
+    $hash->{READINGS}{rainEnd}{VAL}  = "unknown";
+
     $hash->{READINGS}{rainAmount}{TIME} = TimeNow();
     $hash->{READINGS}{rainAmount}{VAL}  = "init";
 
     RainTMC_RequestUpdate($hash);
     RainTMC_ScheduleUpdate($hash);
-    # InternalTimer( gettimeofday() + $hash->{INTERVAL},  "RainTMC_ScheduleUpdate", $hash, 0 );
 
+# InternalTimer( gettimeofday() + $hash->{INTERVAL},  "RainTMC_ScheduleUpdate", $hash, 0 );
+    
     return undef;
 }
 
@@ -186,10 +210,11 @@ sub RainTMC_ParseHttpResponse($) {
     my ( $param, $err, $data ) = @_;
     my $hash = $param->{hash};
     my $name = $hash->{NAME};
-
+    $hash->{URL} = "https://api.themeteocompany.com/precipitation/getforecastbylatlon/?radius=" . AttrVal($name, "radius", 0) ."&lat=" . $hash->{LATITUDE} . "&lon=" . $hash->{LONGITUDE};
+              
     if ( $err ne "" ) {
         Log3( $name, 3,
-            "$name: error while requesting " . $param->{url} . " - $err" );
+            "$name: error while requesting " . $param->{url} . " - " . $data . " - $err" );
         $hash->{STATE}       = "Error: " . $err . " => " . $data;
         $hash->{SHORTRELOAD} = 1;
         RainTMC_ScheduleUpdate($hash);
@@ -198,10 +223,10 @@ sub RainTMC_ParseHttpResponse($) {
 
         my $rainbegin     = "unknown";
         my $rainend       = "unknown";
-        my $rainbegints     = 0;
-        my $rainendts       = 0;
+        my $rainbegints   = 0;
+        my $rainendts     = 0;
         my $rainDataStart = "unknown";
-        my $rainDataEnd = "unknown";
+        my $rainDataEnd   = "unknown";
         my $rainData      = decode_json($data);
         my $rainMax       = 0;
         my $rainamount    = 0;
@@ -214,101 +239,117 @@ sub RainTMC_ParseHttpResponse($) {
         my $endchanged    = 0;
         my $endline       = 0;
         my $parse         = 1;
-        my $l=0;
-        my $as_png ="";
-        my $as_htmlhead ='<tr style="font-size:x-small;"}>';
-        my $as_html ="";
+        my $l             = 0;
+        my $as_png        = "";
+        my $as_htmlhead   = '<tr style="font-size:x-small;"}>';
+        my $as_html       = "";
 
-        my @array = @{$rainData->{ForecastResult}};
+        my @array    = @{ $rainData->{ForecastResult} };
         my $logProxy = "";
         foreach my $a (@array) {
-            
+
             $rain = $a->{Value};
 
             my $timestamp = $a->{TimeStamp};
-            $timestamp =~ /\(([0-9]*)\)/ ;
-            $timestamp = $1/1000;
-            
-            if ($timestamp > time()){
+            $timestamp =~ /\(([0-9]*)\)/;
+            $timestamp = $1 / 1000;
 
-                if (($l % 4) == 0 ) {
-                   $as_htmlhead .="<td >".substr(FmtDateTime($timestamp),-8,5)."</td>"
-                } else {
-                     $as_htmlhead .= "<td>&nbsp;</td>"
-                }
-                if (($a->{ColorAsRGB} eq "Transparent")||($rain==0)) {
-                $as_html .= '<td bgcolor="#ffffff">&nbsp;</td>';
-                } else{
-                    $as_html .= '<td bgcolor="'. $a->{ColorAsRGB} .'">&nbsp;</td>';
-                }
-            $l +=1;
-            if ($l == 1){
-                $rainNow = $rain;
-                $rainDataStart =FmtDateTime($timestamp);
-                $rainData = $rain;
-            }
-            if ($l < 13)
-            {
-                $rainLaMetric .= int ($rain * 1000) . "," ;
-            }
-            $rainTotal += $rain/12;
-            if ($parse) {
-                $rainamount += $rain/12; 
-                if ($beginchanged) {
-                    if ( $rain > 0 ) {
-                        $rainend = FmtDateTime($timestamp);
-                        $rainendts = $timestamp;
-                    }
-                    else {
-                        $rainend    = FmtDateTime($timestamp);
-                        $rainendts = $timestamp;
-                        $endchanged = 1;
-                        $parse      = 0;      # Nur den ersten Schauer auswerten
-                    }
+            if ( $timestamp > time() ) {
+
+                if ( ( $l % 4 ) == 0 ) {
+                    $as_htmlhead .= "<td >"
+                      . substr( FmtDateTime($timestamp), -8, 5 ) . "</td>";
                 }
                 else {
-                    if ( $rain > 0 ) {
-                        $rainbegin    = FmtDateTime($timestamp);
-                        $rainbegints = $timestamp;
-                        $rainendts = $timestamp;
-                        $beginchanged = 1;
-                        $rainend      = FmtDateTime($timestamp);
-                    }
+                    $as_htmlhead .= "<td>&nbsp;</td>";
                 }
-               
+                if ( ( $a->{ColorAsRGB} eq "Transparent" ) || ( $rain == 0 ) ) {
+                    $as_html .= '<td bgcolor="#ffffff">&nbsp;</td>';
+                }
+                else {
+                    $as_html .=
+                      '<td bgcolor="' . $a->{ColorAsRGB} . '">&nbsp;</td>';
+                }
+                $l += 1;
+                if ( $l == 1 ) {
+                    $rainNow       = $rain;
+                    $rainDataStart = FmtDateTime($timestamp);
+                    $rainData      = $rain;
+                }
+                if ( $l < 13 ) {
+                    $rainLaMetric .= int( $rain * 1000 ) . ",";
+                }
+                $rainTotal += $rain / 12;
+                if ($parse) {
+                    $rainamount += $rain / 12;
+                    if ($beginchanged) {
+                        if ( $rain > 0 ) {
+                            $rainend   = FmtDateTime($timestamp);
+                            $rainendts = $timestamp;
+                        }
+                        else {
+                            $rainend    = FmtDateTime($timestamp);
+                            $rainendts  = $timestamp;
+                            $endchanged = 1;
+                            $parse = 0;    # Nur den ersten Schauer auswerten
+                        }
+                    }
+                    else {
+                        if ( $rain > 0 ) {
+                            $rainbegin    = FmtDateTime($timestamp);
+                            $rainbegints  = $timestamp;
+                            $rainendts    = $timestamp;
+                            $beginchanged = 1;
+                            $rainend      = FmtDateTime($timestamp);
+                        }
+                    }
+
+                }
+                my $logtime = FmtDateTime($timestamp);
+                $logtime =~ tr/ /_/;
+                $logProxy .= $logtime . " " . $rain . "\r\n";
+                $rainData .= ":" . $rain;
+                $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
+                $rainDataEnd = FmtDateTime($timestamp);
+                $as_png .= "['"
+                  . (
+                    ( $l % 2 ) ? substr( FmtDateTime($timestamp), -8, 5 ) : "" )
+                  . "',"
+                  . $rain . "],";
             }
-            my $logtime = FmtDateTime($timestamp);
-            $logtime =~ tr/ /_/;
-            $logProxy .= $logtime . " " . $rain."\r\n";
-            $rainData .= ":" . $rain ;
-            $rainMax = ( $rain > $rainMax ) ? $rain : $rainMax;
-            $rainDataEnd =FmtDateTime($timestamp);
-            $as_png .= "['". ( ( $l % 2 ) ? substr(FmtDateTime($timestamp),-8,5)  : "" ) . "'," . $rain ."],";
-            }
-        } # End foreach
-        
+        }    # End foreach
+
         $rainLaMetric = substr( $rainLaMetric, 0, -1 );
-        $as_png = substr( $as_png, 0, -1 );
-        $as_html ="Niederschlagsvorhersage (<a href=./fhem?detail=$name>$name</a>)<BR><table>" . $as_htmlhead."</TR><tr style='border:2pt solid black'>". $as_html. "</tr></table>";
+        $as_png       = substr( $as_png,       0, -1 );
+        $as_html =
+"Niederschlagsvorhersage (<a href=./fhem?detail=$name>$name</a>)<BR><table>"
+          . $as_htmlhead
+          . "</TR><tr style='border:2pt solid black'>"
+          . $as_html
+          . "</tr></table>";
         $hash->{STATE} = sprintf( "%.2f", $rainNow );
 
         readingsBeginUpdate($hash);
-        readingsBulkUpdateIfChanged( $hash, "rainNow", $rainNow );
+        readingsBulkUpdateIfChanged( $hash, "rainNow",      $rainNow );
         readingsBulkUpdateIfChanged( $hash, "rainLaMetric", $rainLaMetric );
-        readingsBulkUpdateIfChanged( $hash, "rainAmount",sprintf( "%.3f", $rainamount * 12 ) );
-        readingsBulkUpdateIfChanged( $hash, "rainTotal",sprintf( "%.3f", $rainTotal * 12 ) );
+        readingsBulkUpdateIfChanged( $hash, "rainAmount",
+            sprintf( "%.3f", $rainamount * 12 ) );
+        readingsBulkUpdateIfChanged( $hash, "rainTotal",
+            sprintf( "%.3f", $rainTotal * 12 ) );
         readingsBulkUpdateIfChanged( $hash, "rainDataStart", $rainDataStart );
-        readingsBulkUpdateIfChanged( $hash, "rainDataEnd", $rainDataEnd );
-        $hash->{".rainData"} = $rainData ;
-        $hash->{".PNG"} = $as_png;
-        $hash->{".HTML"} = $as_html;
+        readingsBulkUpdateIfChanged( $hash, "rainDataEnd",   $rainDataEnd );
+        $hash->{".rainData"} = $rainData;
+        $hash->{".PNG"}      = $as_png;
+        $hash->{".HTML"}     = $as_html;
         $hash->{".logProxy"} = $logProxy;
-        
+
         $hash->{".rainBeginTS"} = $rainbegints;
-        $hash->{".rainEndTS"} = $rainendts;
-             
-        readingsBulkUpdateIfChanged( $hash, "rainMax", sprintf( "%.3f", $rainMax ) );
-        readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin, $beginchanged );
+        $hash->{".rainEndTS"}   = $rainendts;
+
+        readingsBulkUpdateIfChanged( $hash, "rainMax",
+            sprintf( "%.3f", $rainMax ) );
+        readingsBulkUpdateIfChanged( $hash, "rainBegin", $rainbegin,
+            $beginchanged );
         readingsBulkUpdateIfChanged( $hash, "rainEnd", $rainend, $endchanged );
         readingsEndUpdate( $hash, 1 );
     }
@@ -316,25 +357,23 @@ sub RainTMC_ParseHttpResponse($) {
 
 sub RainTMC_logProxy($) {
     my ($name) = @_;
-    my $hash   = $defs{$name};
+    my $hash = $defs{$name};
     my $ret;
 
     return ( $hash->{".logProxy"}, 0, ReadingsVal( $name, "rainMax", 0 ) );
 }
 
-
 sub RainTMC_HTML($) {
     my ($name) = @_;
-    my $hash   = $defs{$name};
-    
-    return  $hash->{".HTML"};
-}
+    my $hash = $defs{$name};
 
+    return $hash->{".HTML"};
+}
 
 sub RainTMC_PNG($) {
     my ($name) = @_;
-    my $retval = '<div id="chart_div_'.$name.'"; ';
-$retval .= <<'END_MESSAGE';
+    my $retval = '<div id="chart_div_' . $name . '"; ';
+    $retval .= <<'END_MESSAGE';
  style="width:100%; height:100%"></div>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
  <script type="text/javascript">
@@ -351,8 +390,9 @@ END_MESSAGE
 ]);
 
  var options = {
-          title: 'Niederschlag',
+
 END_MESSAGE
+    $retval .= 'title: "Niederschlag (' . $name .')",';
     $retval .= "subtitle: 'Vorhersage (" . $name . ")',";
 
     $retval .= <<'END_MESSAGE';
@@ -366,9 +406,9 @@ END_MESSAGE
         var my_div = document.getElementById(
 END_MESSAGE
 
-    $retval .='"chart_div_'.$name.'");';
+    $retval .= '"chart_div_' . $name . '");';
 
-$retval .= <<'END_MESSAGE';
+    $retval .= <<'END_MESSAGE';
         var chart = new google.visualization.AreaChart(my_div);
         google.visualization.events.addListener(chart, 'ready', function () {
         my_div.innerHTML = '<img src="' + chart.getImageURI() + '">';
